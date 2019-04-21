@@ -3,7 +3,7 @@ using Softplan.Common.Messaging.Abstractions;
 
 namespace rpcExample
 {
-    class FibMessage : Message, IMessage
+    public class FibMessage : Message, IMessage
     {
         public FibMessage(IMessage parentMessage = null) : base(parentMessage)
         {
