@@ -1,22 +1,22 @@
-# DotNetMQ
+# Softplan.Common.Messaging
 
 Biblioteca DotNet compatível com o [DelphiMQ](https://git-unj.softplan.com.br/unj-integracoes/DelphiMQ), implementando as mesmas regras e visando facilitar a integração das aplicações legadas com o SAJ 6 e demais aplicações desenvolvidas em C#
 
 ## Como usar a lib
 
-Se estiver criando uma WebApi, basta adicionar ao seu `ConfigureServices` uma chamada a `AddDotnetMQ`
+Se estiver criando uma WebApi, basta adicionar ao seu `ConfigureServices` uma chamada a `AddMessagingManager`
 
 ```csharp
     public void ConfigureServices(IServiceCollection services)
     {
 
-        services.AddDotnetMQ(Configuration, loggerFactory);
+        services.AddMessagingManager(Configuration, loggerFactory);
 
         services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
     }
 ```
 
-E depois iniciar os serviços com o método `StartDotnetMQ()` no `Configure` do `Startup.cs`
+E depois iniciar os serviços com o método `StartMessagingManager()` no `Configure` do `Startup.cs`
 
 ```csharp
     public void Configure(IApplicationBuilder app)
@@ -30,7 +30,7 @@ E depois iniciar os serviços com o método `StartDotnetMQ()` no `Configure` do 
 
         app.UseHsts().UseHttpsRedirection();
 
-        app.ApplicationServices.StartDotnetMQ();
+        app.ApplicationServices.StartMessagingManager();
     }
 ```
 

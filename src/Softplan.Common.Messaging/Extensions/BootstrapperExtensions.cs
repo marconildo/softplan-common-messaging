@@ -10,7 +10,7 @@ namespace Softplan.Common.Messaging.Extensions
 {
     public static class BootstrapperExtensions
     {
-        public static IServiceCollection AddDotnetMQ(this IServiceCollection services, IConfiguration config, ILoggerFactory loggerFactory)
+        public static IServiceCollection AddMessagingManager(this IServiceCollection services, IConfiguration config, ILoggerFactory loggerFactory)
         {
             services.TryAddSingleton<IBuilder>(provider => new AmqpBuilder(config, loggerFactory));
             services.TryAddScoped<IPublisher>(provider => provider.GetService<IBuilder>().BuildPublisher());
@@ -18,7 +18,7 @@ namespace Softplan.Common.Messaging.Extensions
             return services;
         }
 
-        public static IServiceProvider StartDotnetMQ(this IServiceProvider provider)
+        public static IServiceProvider StartMessagingManager(this IServiceProvider provider)
         {
             var manager = provider.GetService<IMessagingManager>();
             manager.LoadProcessors(provider);
