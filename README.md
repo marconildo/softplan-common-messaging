@@ -1,6 +1,11 @@
 # Softplan.Common.Messaging
 
-Biblioteca DotNet compatível com o [DelphiMQ](https://git-unj.softplan.com.br/unj-integracoes/DelphiMQ), implementando as mesmas regras e visando facilitar a integração das aplicações legadas com o SAJ 6 e demais aplicações desenvolvidas em C#
+Biblioteca que visa simplificar o uso de padrões comuns nas implementações de softwares que usam recursos
+de message brokers como o RabbitMQ.
+
+Esta lib abstrai as partes internas do uso de canais de mensageria e deixa ao desenvolvedor somente a
+responsabilidade de escrever a sua lógica sem se preocupar com infra estrutura, convenções e boas
+práticas para implementar padrões como PubSub, RequestReply, FireAndForget.
 
 ## Como usar a lib
 
