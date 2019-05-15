@@ -11,16 +11,16 @@ namespace Softplan.Common.Messaging
     {
         public Message(IMessage parentMessage = null)
         {
-            this.OperationId = Guid.NewGuid().ToString();
-            this.ParentOperationId = OperationId;
-            this.MainOperationId = OperationId;
-            this.CustomParams = new Dictionary<string, string>();
-            this.OldCustomParams = new LegacyCustomParams();
-            this.Headers = new Dictionary<string, object>();
+            OperationId = Guid.NewGuid().ToString();
+            ParentOperationId = OperationId;
+            MainOperationId = OperationId;
+            CustomParams = new Dictionary<string, string>();
+            OldCustomParams = new LegacyCustomParams();
+            Headers = new Dictionary<string, object>();
 
             if (parentMessage != null)
             {
-                this.AssignBaseMessageData(parentMessage);
+                AssignBaseMessageData(parentMessage);
             }
         }
 
@@ -40,12 +40,12 @@ namespace Softplan.Common.Messaging
 
         public void AssignBaseMessageData(IMessage baseMessage)
         {
-            this.MainOperationId = baseMessage.MainOperationId;
-            this.ParentOperationId = baseMessage.OperationId;
-            this.ReplyQueue = baseMessage.ReplyQueue;
+            MainOperationId = baseMessage.MainOperationId;
+            ParentOperationId = baseMessage.OperationId;
+            ReplyQueue = baseMessage.ReplyQueue;
             foreach (var p in baseMessage.CustomParams)
             {
-                this.CustomParams.Add(p.Key, p.Value);
+                CustomParams.Add(p.Key, p.Value);
             }
         }
 

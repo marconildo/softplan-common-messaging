@@ -25,7 +25,7 @@ namespace Softplan.Common.Messaging.AMQP
             MessageQueueMap = new Dictionary<string, Type>();
             var factory = connectionFactory ?? new ConnectionFactory() { Uri = new Uri(appSettings.GetValue<string>("RABBIT_URL")) };
 
-            this.connection = factory.CreateConnection();
+            connection = factory.CreateConnection();
         }
 
         public IQueueApiManager BuildAPIManager()
@@ -36,11 +36,11 @@ namespace Softplan.Common.Messaging.AMQP
             }
 
             logger.LogTrace("Creating a new API Manager instance.");
-            var parser = new Uri(this.appSettings.GetValue<string>("RABBIT_API_URL"));
+            var parser = new Uri(appSettings.GetValue<string>("RABBIT_API_URL"));
             var userInfo = parser.UserInfo.Split(new[] { ':' });
             var user = userInfo.Length >= 1 && !string.IsNullOrEmpty(userInfo[0]) ? userInfo[0] : "guest";
             var password = userInfo.Length >= 2 ? userInfo[1] : "guest";
-            apiManager = new RabbitMQApiManager(this.appSettings.GetValue<string>("RABBIT_API_URL"),
+            apiManager = new RabbitMQApiManager(appSettings.GetValue<string>("RABBIT_API_URL"),
                 user,
                 password,
                 connection.CreateModel());

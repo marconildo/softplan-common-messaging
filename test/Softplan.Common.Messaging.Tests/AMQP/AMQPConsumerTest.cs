@@ -23,7 +23,7 @@ namespace Softplan.Common.Messaging.UnitTest.AMQP
 
             public void ProtectedOnMessageReceived(IProcessor processor, string queue, BasicDeliverEventArgs args)
             {
-                base.OnMessageReceived(processor, queue, args);
+                OnMessageReceived(processor, queue, args);
             }
         }
         private readonly Mock<IModel> channelMock;

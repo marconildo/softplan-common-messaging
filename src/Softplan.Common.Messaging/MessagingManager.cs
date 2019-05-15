@@ -38,7 +38,7 @@ namespace Softplan.Common.Messaging
 
         public MessagingManager(IBuilder builder, ILoggerFactory loggerFactory)
         {
-            this.Builder = builder;
+            Builder = builder;
             this.loggerFactory = loggerFactory;
 
             logger = loggerFactory.CreateLogger<MessagingManager>();

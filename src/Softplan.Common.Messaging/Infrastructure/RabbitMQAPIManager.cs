@@ -22,7 +22,7 @@ namespace Softplan.Common.Messaging.Infrastructure
         }
         private string GetUrl(string resourceUrl)
         {
-            return this.url + resourceUrl;
+            return url + resourceUrl;
         }
         public RabbitMQApiManager(string url, string user, string password, IModel channel, HttpClient client = null)
         {
@@ -30,13 +30,13 @@ namespace Softplan.Common.Messaging.Infrastructure
             this.channel = channel;
             this.client = client ?? new HttpClient();
             this.client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
-                "Basic", Convert.ToBase64String(System.Text.ASCIIEncoding.ASCII.GetBytes($"{user}:{password}"))
+                "Basic", Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes($"{user}:{password}"))
             );
         }
 
         public QueueInfo GetQueueInfo(string queueName)
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, this.GetUrl(GetQueueResourceUrl(queueName)));
+            var request = new HttpRequestMessage(HttpMethod.Get, GetUrl(GetQueueResourceUrl(queueName)));
             var response = client.SendAsync(request).Result;
 
             switch (response.StatusCode)
@@ -64,7 +64,7 @@ namespace Softplan.Common.Messaging.Infrastructure
             if (new Regex(@"^amq.").IsMatch(queueName))
                 return queueName;
 
-            var info = this.GetQueueInfo(queueName);
+            var info = GetQueueInfo(queueName);
             var resp = channel.QueueDeclare(
                 queue: queueName,
                 durable: info.Durable,

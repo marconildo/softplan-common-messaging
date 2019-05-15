@@ -24,7 +24,7 @@ namespace Softplan.Common.Messaging.AMQP
 
         private IBasicProperties GetBasicMessageProperties(IMessage message)
         {
-            var props = this.channel.CreateBasicProperties();
+            var props = channel.CreateBasicProperties();
             props.Persistent = true;
             props.DeliveryMode = 2;
             props.ContentEncoding = "utf-8";
@@ -52,8 +52,8 @@ namespace Softplan.Common.Messaging.AMQP
             if (String.IsNullOrEmpty(_destination))
                 throw new ArgumentException("Destination cannot be empty.");
 
-            this.manager.EnsureQueue(_destination);
-            this.channel.BasicPublish("", _destination, false, GetBasicMessageProperties(message), serializer.Serialize(message, Encoding.UTF8));
+            manager.EnsureQueue(_destination);
+            channel.BasicPublish("", _destination, false, GetBasicMessageProperties(message), serializer.Serialize(message, Encoding.UTF8));
         }
 
         public Task<T> PublishAndWait<T>(IMessage message, string destination = "", bool forceDestination = false, int millisecodsTimeout = 60000) where T : IMessage
@@ -67,7 +67,7 @@ namespace Softplan.Common.Messaging.AMQP
                 var consumerTag = channel.BasicConsume(replyQueue, true, CreateConsumer(respQueue));
                 try
                 {
-                    this.Publish(message, destination, forceDestination);
+                    Publish(message, destination, forceDestination);
 
                     if (!respQueue.TryTake(out T reply, millisecodsTimeout))
                         throw new TimeoutException("A resposta da mensagem não foi recebida");

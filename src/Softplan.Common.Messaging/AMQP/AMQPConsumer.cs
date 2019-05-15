@@ -16,10 +16,10 @@ namespace Softplan.Common.Messaging.AMQP
 
         public AmqpConsumer(IModel channel, IPublisher publisher, IBuilder builder, IQueueApiManager manager)
         {
-            this.channel = channel ?? throw new System.ArgumentNullException(nameof(channel));
-            this.publisher = publisher ?? throw new System.ArgumentNullException(nameof(publisher));
-            this.builder = builder ?? throw new System.ArgumentNullException(nameof(builder));
-            this.manager = manager ?? throw new System.ArgumentNullException(nameof(manager));
+            this.channel = channel ?? throw new ArgumentNullException(nameof(channel));
+            this.publisher = publisher ?? throw new ArgumentNullException(nameof(publisher));
+            this.builder = builder ?? throw new ArgumentNullException(nameof(builder));
+            this.manager = manager ?? throw new ArgumentNullException(nameof(manager));
         }
 
         public void Start(IProcessor processor, string queue)
