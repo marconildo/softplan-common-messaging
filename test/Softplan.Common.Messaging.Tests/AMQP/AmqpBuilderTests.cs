@@ -1,14 +1,14 @@
-using Softplan.Common.Messaging.AMQP;
-using Softplan.Common.Messaging.Infrastructure;
+using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Exceptions;
-using System.Collections.Generic;
+using Softplan.Common.Messaging.AMQP;
+using Softplan.Common.Messaging.Infrastructure;
 using Xunit;
 
-namespace Softplan.Common.Messaging.UnitTest.AMQP
+namespace Softplan.Common.Messaging.Tests.AMQP
 {
     public class AmqpBuilderTests
     {

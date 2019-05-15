@@ -13,7 +13,7 @@ namespace Softplan.Common.Messaging.AMQP
         private readonly IConfiguration appSettings;
         private readonly ILogger logger;
         private readonly IConnection connection;
-        private IQueueApiManager apiManager = null;
+        private IQueueApiManager apiManager;
 
         public IDictionary<string, Type> MessageQueueMap { get; private set; }
 
@@ -79,7 +79,7 @@ namespace Softplan.Common.Messaging.AMQP
         }
 
         #region IDisposable Support
-        private bool disposedValue = false; // Para detectar chamadas redundantes
+        private bool disposedValue; // Para detectar chamadas redundantes
 
         protected virtual void Dispose(bool disposing)
         {

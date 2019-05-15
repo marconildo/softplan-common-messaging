@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using Xunit;
-using Softplan.Common.Messaging;
 
-namespace Softplan.Common.Messaging.UnitTest
+namespace Softplan.Common.Messaging.Tests
 {
     public class LegacyCustomParamsTest
     {

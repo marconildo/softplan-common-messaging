@@ -1,15 +1,14 @@
 using System;
-using RabbitMQ.Client;
-using Moq;
-using Softplan.Common.Messaging.Abstractions;
 using System.Collections.Generic;
-using Softplan.Common.Messaging.Infrastructure;
-using Softplan.Common.Messaging.AMQP;
-using Xunit;
 using System.Text;
-using Moq.Protected;
+using Moq;
+using RabbitMQ.Client;
+using Softplan.Common.Messaging.Abstractions;
+using Softplan.Common.Messaging.AMQP;
+using Softplan.Common.Messaging.Infrastructure;
+using Xunit;
 
-namespace Softplan.Common.Messaging.UnitTest.AMQP
+namespace Softplan.Common.Messaging.Tests.AMQP
 {
     public class AMQPPubliserTest : IDisposable
     {

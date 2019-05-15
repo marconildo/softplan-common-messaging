@@ -15,7 +15,7 @@ namespace Softplan.Common.Messaging
         private readonly ILogger logger;
         private readonly IList<IConsumer> consumers;
         private readonly ILoggerFactory loggerFactory;
-        private bool active = false;
+        private bool active;
 
         public IList<IProcessor> EnabledProcessors { get; set; }
         public IBuilder Builder { get; }
@@ -71,6 +71,7 @@ namespace Softplan.Common.Messaging
                 Stop();
             }
         }
+        
         public void Stop()
         {
             if (!active)
@@ -88,71 +89,13 @@ namespace Softplan.Common.Messaging
         {
             EnabledProcessors.Add(processor);
             Builder.MessageQueueMap[processor.GetQueueName()] = processor.GetMessageType();
-        }
+        }        
 
-        private IList<object> GetConstructorDIArgs(ConstructorInfo ctor, IServiceProvider serviceProvider)
+        private static IProcessor CreateProcessor(IServiceProvider serviceProvider, Type type)
         {
-            IList<object> args = new List<object>();
+            return (from constructorInfo in type.GetConstructors() let args = GetConstructorDIArgs(constructorInfo, serviceProvider) where args.Count == constructorInfo.GetParameters().Count() select constructorInfo.Invoke(args.ToArray()) as IProcessor).FirstOrDefault();
+        }                
 
-            foreach (var arg in ctor.GetParameters())
-            {
-
-                var svc = serviceProvider.GetService(arg.ParameterType);
-                if (svc == null)
-                {
-                    if (!arg.HasDefaultValue)
-                    {
-                        return args;
-                    }
-
-                    svc = arg.DefaultValue;
-                }
-
-                args.Add(svc);
-            }
-
-            return args;
-        }
-
-        private IProcessor CreateProcessor(IServiceProvider serviceProvider, Type type)
-        {
-
-            foreach (var ctor in type.GetConstructors())
-            {
-                var args = GetConstructorDIArgs(ctor, serviceProvider);
-
-                if (args.Count != ctor.GetParameters().Count())
-                {
-                    continue;
-                }
-
-                return ctor.Invoke(args.ToArray()) as IProcessor;
-            }
-            return null;
-        }
-
-        private bool ShouldIgnoreProcessor(Type type)
-        {
-            if (EnabledProcessors.FirstOrDefault(p => p.GetType() == type) != null)
-            {
-                logger.LogDebug($"Processor {type} is already registered.");
-                return true;
-            }
-
-            if (type.IsAbstract || !type.IsClass || type.IsNotPublic)
-            {
-                logger.LogDebug($"Processor {type} is not a valid, public processor type.");
-                return true;
-            }
-
-            if (ProcessorIgnorer != null && ProcessorIgnorer.ShouldIgnoreProcessorFrom(type))
-            {
-                logger.LogDebug($"Processor of {type} was explicity ignored.");
-                return true;
-            }
-
-            return false;
-        }
         public void LoadProcessors(IServiceProvider serviceProvider)
         {
             var types = AppDomain
@@ -197,21 +140,71 @@ namespace Softplan.Common.Messaging
             }
             consumers.Clear();
         }
+        
+        private static IList<object> GetConstructorDIArgs(MethodBase ctor, IServiceProvider serviceProvider)
+        {
+            IList<object> args = new List<object>();
+
+            foreach (var arg in ctor.GetParameters())
+            {
+
+                var svc = serviceProvider.GetService(arg.ParameterType);
+                if (svc == null)
+                {
+                    if (!arg.HasDefaultValue)
+                    {
+                        return args;
+                    }
+
+                    svc = arg.DefaultValue;
+                }
+
+                args.Add(svc);
+            }
+
+            return args;
+        }
+
+        private bool ShouldIgnoreProcessor(Type type)
+        {
+            return ProcessorAlreadyRegistered(type) ||
+                   ShouldIgnoreProcessorByType(type) ||
+                   ProcessorExplicityIgnored(type);
+        }
+
+        private bool ProcessorAlreadyRegistered(Type type)
+        {
+            if (EnabledProcessors.FirstOrDefault(p => p.GetType() == type) == null) return false;
+            logger.LogDebug($"Processor {type} is already registered.");
+            return true;
+        }
+
+        private bool ShouldIgnoreProcessorByType(Type type)
+        {
+            if (!type.IsAbstract && type.IsClass && !type.IsNotPublic) return false;
+            logger.LogDebug($"Processor {type} is not a valid, public processor type.");
+            return true;
+        }
+
+        private bool ProcessorExplicityIgnored(Type type)
+        {
+            if (ProcessorIgnorer == null || !ProcessorIgnorer.ShouldIgnoreProcessorFrom(type)) return false;
+            logger.LogDebug($"Processor of {type} was explicity ignored.");
+            return true;
+        }
 
         #region IDisposable Support
-        private bool disposedValue = false; // Para detectar chamadas redundantes
+        private bool disposedValue; // Para detectar chamadas redundantes
 
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposedValue)
+            if (disposedValue) return;
+            if (disposing)
             {
-                if (disposing)
-                {
-                    StopConsumers();
-                }
-
-                disposedValue = true;
+                StopConsumers();
             }
+
+            disposedValue = true;
         }
 
         // Não altere este código. Coloque o código de limpeza em Dispose(bool disposing) acima.

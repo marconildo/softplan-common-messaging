@@ -1,8 +1,7 @@
-using Xunit;
-using Softplan.Common.Messaging;
 using System.Text;
+using Xunit;
 
-namespace Softplan.Common.Messaging.UnitTest
+namespace Softplan.Common.Messaging.Tests
 {
     public class JsonSerializerTests
     {

@@ -1,10 +1,8 @@
-using System;
-using Xunit;
-using Softplan.Common.Messaging;
-using Newtonsoft.Json;
 using System.Collections.Generic;
+using Newtonsoft.Json;
+using Xunit;
 
-namespace Softplan.Common.Messaging.UnitTest
+namespace Softplan.Common.Messaging.Tests
 {
     public class MessageTest
     {

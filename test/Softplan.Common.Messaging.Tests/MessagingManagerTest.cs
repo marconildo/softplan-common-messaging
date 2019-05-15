@@ -1,15 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Threading;
-using Softplan.Common.Messaging.Abstractions;
-using Softplan.Common.Messaging.UnitTest.TestProcessors;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Softplan.Common.Messaging.Abstractions;
+using Softplan.Common.Messaging.Tests.TestProcessors;
 using Xunit;
 
-namespace Softplan.Common.Messaging.UnitTest
+namespace Softplan.Common.Messaging.Tests
 {
     public class MessagingManagerTest
     {
@@ -25,10 +22,7 @@ namespace Softplan.Common.Messaging.UnitTest
         [Fact]
         public void StartTest()
         {
-            var manager = new MessagingManager(builderMock.Object, loggerFactoryMock.Object)
-            {
-                Active = true
-            };
+            var manager = new MessagingManager(builderMock.Object, loggerFactoryMock.Object) {Active = true};
             Assert.True(manager.Active);
         }
 
@@ -36,8 +30,7 @@ namespace Softplan.Common.Messaging.UnitTest
         [Fact]
         public void StartTwiceTest()
         {
-            var manager = new MessagingManager(builderMock.Object, loggerFactoryMock.Object);
-            manager.Active = true;
+            var manager = new MessagingManager(builderMock.Object, loggerFactoryMock.Object) {Active = true};
             Assert.True(manager.Active);
             manager.Start();
             Assert.True(manager.Active);
@@ -46,8 +39,7 @@ namespace Softplan.Common.Messaging.UnitTest
         [Fact]
         public void StopTest()
         {
-            var manager = new MessagingManager(builderMock.Object, loggerFactoryMock.Object);
-            manager.Active = true;
+            var manager = new MessagingManager(builderMock.Object, loggerFactoryMock.Object) {Active = true};
             Assert.True(manager.Active);
             manager.Active = false;
             Assert.False(manager.Active);
@@ -56,8 +48,7 @@ namespace Softplan.Common.Messaging.UnitTest
         [Fact]
         public void StopTwiceTest()
         {
-            var manager = new MessagingManager(builderMock.Object, loggerFactoryMock.Object);
-            manager.Active = true;
+            var manager = new MessagingManager(builderMock.Object, loggerFactoryMock.Object) {Active = true};
             Assert.True(manager.Active);
             manager.Active = false;
             Assert.False(manager.Active);
@@ -68,8 +59,7 @@ namespace Softplan.Common.Messaging.UnitTest
         [Fact]
         public void DisposeTest()
         {
-            var manager = new MessagingManager(builderMock.Object, loggerFactoryMock.Object);
-            manager.Active = true;
+            var manager = new MessagingManager(builderMock.Object, loggerFactoryMock.Object) {Active = true};
             manager.Dispose();
         }
 
@@ -82,11 +72,13 @@ namespace Softplan.Common.Messaging.UnitTest
             var processorIgnorerMock = new Mock<IProcessorIgnorer>();
             processorIgnorerMock.Setup(i => i.ShouldIgnoreProcessorFrom(It.IsAny<Type>()))
                 .Returns((Type v) => v.Namespace.Contains("Castle.Proxies"));
-
-
-            var manager = new MessagingManager(builderMock.Object, loggerFactoryMock.Object);
-            manager.ProcessorIgnorer = processorIgnorerMock.Object;
+            var manager = new MessagingManager(builderMock.Object, loggerFactoryMock.Object)
+            {
+                ProcessorIgnorer = processorIgnorerMock.Object
+            };
+            
             manager.LoadProcessors(new Mock<IServiceProvider>().Object);
+            
             Assert.Equal(1, manager.EnabledProcessors.Count);
             Assert.IsType<TestProcessor>(manager.EnabledProcessors[0]);
         }
@@ -100,13 +92,15 @@ namespace Softplan.Common.Messaging.UnitTest
             var processorIgnorerMock = new Mock<IProcessorIgnorer>();
             processorIgnorerMock.Setup(i => i.ShouldIgnoreProcessorFrom(It.IsAny<Type>()))
                 .Returns((Type v) => v.Namespace.Contains("Castle.Proxies"));
-
-            var manager = new MessagingManager(builderMock.Object, loggerFactoryMock.Object);
-            manager.ProcessorIgnorer = processorIgnorerMock.Object;
+            var manager = new MessagingManager(builderMock.Object, loggerFactoryMock.Object)
+            {
+                ProcessorIgnorer = processorIgnorerMock.Object
+            };
             manager.RegisterProcessor(new TestProcessor());
             Assert.Equal(1, manager.EnabledProcessors.Count);
 
             manager.LoadProcessors(new Mock<IServiceProvider>().Object);
+            
             Assert.Equal(1, manager.EnabledProcessors.Count);
             Assert.IsType<TestProcessor>(manager.EnabledProcessors[0]);
         }

@@ -1,9 +1,8 @@
-using Xunit;
-using Softplan.Common.Messaging;
-using Softplan.Common.Messaging.Infrastructure;
 using Newtonsoft.Json;
+using Softplan.Common.Messaging.Infrastructure;
+using Xunit;
 
-namespace Softplan.Common.Messaging.UnitTest.Infrastruture
+namespace Softplan.Common.Messaging.Tests.Infrastructure
 {
     public class QueueInfoTest
     {

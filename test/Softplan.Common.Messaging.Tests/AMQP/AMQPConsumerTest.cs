@@ -1,16 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using Moq;
 using RabbitMQ.Client;
-using Xunit;
-
+using RabbitMQ.Client.Events;
 using Softplan.Common.Messaging.Abstractions;
 using Softplan.Common.Messaging.AMQP;
-using RabbitMQ.Client.Events;
-using System.Text;
-using System.Text.RegularExpressions;
+using Xunit;
 
-namespace Softplan.Common.Messaging.UnitTest.AMQP
+namespace Softplan.Common.Messaging.Tests.AMQP
 {
     public class AmqpConsumerTest
     {
