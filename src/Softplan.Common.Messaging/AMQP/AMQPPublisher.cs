@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Softplan.Common.Messaging.Abstractions;
-using Softplan.Common.Messaging.Infrastructure;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 

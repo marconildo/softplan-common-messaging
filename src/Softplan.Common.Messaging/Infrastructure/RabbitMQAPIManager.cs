@@ -4,7 +4,6 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
 using Softplan.Common.Messaging.Abstractions;
-using Softplan.Common.Messaging.AMQP;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 
