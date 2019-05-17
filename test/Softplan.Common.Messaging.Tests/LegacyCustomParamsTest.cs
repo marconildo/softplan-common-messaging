@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using FluentAssertions;
 using Xunit;
 
 namespace Softplan.Common.Messaging.Tests
@@ -28,22 +29,22 @@ namespace Softplan.Common.Messaging.Tests
 
         [Theory]
         [MemberData(nameof(ToDictData))]
-        public void ConvertToDictWithDataTest(IList<string> data, Dictionary<string, string> target)
+        public void When_Convert_To_Dict_Should_Return_The_Expected_Result(IList<string> data, Dictionary<string, string> target)
         {
             var par = new LegacyCustomParams();
             foreach (var s in data) { par.Items.Add(s); };
             var dict = new Dictionary<string, string>();
             par.ToDictionary(dict);
-            Assert.Equal(target, dict);
+            dict.Should().BeEquivalentTo(target);
         }
 
         [Theory]
         [MemberData(nameof(FromDictData))]
-        public void ConvertFromDictWithDataTest(Dictionary<string, string> data, IList<string> target)
+        public void When_Convert_From_Dict_Should_Return_The_Expected_Result(Dictionary<string, string> data, IList<string> target)
         {
             var par = new LegacyCustomParams();
             par.FromDictionary(data);
-            Assert.Equal(target, par.Items);
+            par.Items.Should().BeEquivalentTo(target);
         }
     }
 }

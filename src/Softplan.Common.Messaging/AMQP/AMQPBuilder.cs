@@ -70,7 +70,7 @@ namespace Softplan.Common.Messaging.AMQP
 
         public ISerializer BuildSerializer()
         {
-            return new JsonSerializer();
+            return new MessageSerializer();
         }
 
         private IPublisher InternalBuildPublisher(IModel channel)
