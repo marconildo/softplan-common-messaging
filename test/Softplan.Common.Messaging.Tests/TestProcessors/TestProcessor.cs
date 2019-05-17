@@ -8,11 +8,6 @@ namespace Softplan.Common.Messaging.Tests.TestProcessors
     {
         public ILogger Logger { get; set; }
 
-        public TestProcessor(bool valid = true)
-        {
-            //test for default args
-        }
-
         public Type GetMessageType()
         {
             return typeof(Message);
@@ -20,7 +15,7 @@ namespace Softplan.Common.Messaging.Tests.TestProcessors
 
         public string GetQueueName()
         {
-            return String.Empty;
+            return string.Empty;
         }
 
         public bool HandleProcessError(IMessage message, IPublisher publisher, Exception error)

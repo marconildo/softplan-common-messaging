@@ -6,11 +6,11 @@ namespace Softplan.Common.Messaging.Tests.TestProcessors
 {
     public class InvalidConstructorProcessor : IProcessor
     {
-        private readonly int invalidArg;
+        private readonly int _invalidArg;
 
         public InvalidConstructorProcessor(int invalidArg)
         {
-            this.invalidArg = invalidArg;
+            this._invalidArg = invalidArg;
         }
 
         public ILogger Logger { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }

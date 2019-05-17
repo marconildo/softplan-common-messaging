@@ -55,25 +55,29 @@ namespace Softplan.Common.Messaging
                 StartConsumers();
                 _logger.LogInformation(Resources.MQManagerStarted);
             }
-            catch (Exception err)
+            catch (Exception ex)
             {
-                _logger.LogError(err, Resources.MQManagerErrorWhileStarting);
+                _logger.LogError(ex, Resources.MQManagerErrorWhileStarting);
                 Stop();
             }
         }        
 
         public void Stop()
         {
-            if (!_active)
-            {
-                return;
-            }
+            if (IsInactive()) return;
 
-            _logger.LogInformation(Resources.MQManagerStopping);
-            StopConsumers();
-            _active = false;
-            _logger.LogInformation(Resources.MQManagerStopped);
-        }
+            try
+            {
+                _logger.LogInformation(Resources.MQManagerStopping);
+                StopConsumers();
+                _active = false;
+                _logger.LogInformation(Resources.MQManagerStopped);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, Resources.MQManagerErrorWhileStopping);
+            }
+        }        
 
         public void RegisterProcessor(IProcessor processor)
         {
@@ -83,29 +87,16 @@ namespace Softplan.Common.Messaging
 
         public void LoadProcessors(IServiceProvider serviceProvider)
         {
-            var types = AppDomain
-                .CurrentDomain
-                .GetAssemblies()
-                .SelectMany(assembly => assembly.ListImplementationsOf<IProcessor>());
-
+            var types = GetTypes();
             foreach (var type in types)
             {
-                if (ShouldIgnoreProcessor(type))
-                {
-                    continue;
-                }
-
+                if (ShouldIgnoreProcessor(type)) continue;                
                 var processor = CreateProcessor(serviceProvider, type);
-                if (processor == null)
-                {
-                    _logger.LogWarning(string.Format(Resources.ErrorToCreateProcessorInstance, type));
-                    continue;
-                }
-
+                if (ProcessorIsNull(processor, type)) continue;
                 RegisterProcessor(processor);
             }
-        }
-        
+        }        
+
         private bool IsActive()
         {
             if (!_active) return false;
@@ -124,6 +115,13 @@ namespace Softplan.Common.Messaging
             }
         }
 
+        private bool IsInactive()
+        {
+            if (_active) return false;
+            _logger.LogInformation(Resources.MQManagerNotStarted);
+            return true;
+        }
+        
         private void StopConsumers()
         {
             foreach (var consumer in _consumers)
@@ -131,7 +129,16 @@ namespace Softplan.Common.Messaging
                 consumer.Stop();
             }
             _consumers.Clear();
-        }                
+        } 
+        
+        private static IEnumerable<Type> GetTypes()
+        {
+            var types = AppDomain
+                .CurrentDomain
+                .GetAssemblies()
+                .SelectMany(assembly => assembly.ListImplementationsOf<IProcessor>());
+            return types;
+        }
 
         private bool ShouldIgnoreProcessor(Type type)
         {
@@ -171,22 +178,24 @@ namespace Softplan.Common.Messaging
         
         private static IList<object> GetConstructorDiArgs(MethodBase methodBase, IServiceProvider serviceProvider)
         {
-            IList<object> args = new List<object>();
-            foreach (var arg in methodBase.GetParameters())
-            {
-                var svc = serviceProvider.GetService(arg.ParameterType);
-                if (svc == null)
-                {
-                    if (!arg.HasDefaultValue)
-                    {
-                        return args;
-                    }
-                    svc = arg.DefaultValue;
-                }
-                args.Add(svc);
-            }
-            return args;
+            return methodBase.GetParameters().Select(arg => GetServiceValue(arg, serviceProvider))
+                                             .Where(svc => svc != null).ToList();
         }
+        
+        private static object GetServiceValue(ParameterInfo arg, IServiceProvider serviceProvider)
+        {
+            var svc = serviceProvider.GetService(arg.ParameterType);
+            if (svc != null) return svc;
+            return arg.HasDefaultValue ? arg.DefaultValue : null;
+        }
+        
+        private bool ProcessorIsNull(IProcessor processor, Type type)
+        {
+            if (processor != null) return false;
+            _logger.LogWarning(string.Format(Resources.ErrorToCreateProcessorInstance, type));
+            return true;
+        }
+        
 
         #region IDisposable Support
         private bool _disposedValue; // Para detectar chamadas redundantes

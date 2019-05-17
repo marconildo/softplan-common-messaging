@@ -21,6 +21,9 @@
     <data name="MQManagerAlreadyStarted" xml:space="preserve">
         <value>MQManager already started.</value>
     </data>
+    <data name="MQManagerNotStarted" xml:space="preserve">
+        <value>MQManager is not started.</value>
+    </data>
     <data name="MQManagerStarting" xml:space="preserve">
         <value>Starting MQManager.</value>
     </data>
@@ -35,6 +38,9 @@
     </data>
     <data name="MQManagerStopped" xml:space="preserve">
         <value>MQManager stopped.</value>
+    </data>
+    <data name="MQManagerErrorWhileStopping" xml:space="preserve">
+        <value>Error while stopping MQManager.</value>
     </data>
     <data name="ErrorToCreateProcessorInstance" xml:space="preserve">
         <value>Could not create a instance of {0} processor.</value>

@@ -88,6 +88,24 @@ namespace Softplan.Common.Messaging.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Error while stopping MQManager..
+        /// </summary>
+        public static string MQManagerErrorWhileStopping {
+            get {
+                return ResourceManager.GetString("MQManagerErrorWhileStopping", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MQManager is not started..
+        /// </summary>
+        public static string MQManagerNotStarted {
+            get {
+                return ResourceManager.GetString("MQManagerNotStarted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to MQManager started..
         /// </summary>
         public static string MQManagerStarted {
