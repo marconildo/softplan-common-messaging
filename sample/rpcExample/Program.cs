@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Specialized;
 using Softplan.Common.Messaging;
 using Softplan.Common.Messaging.Abstractions;
 using Softplan.Common.Messaging.AMQP;

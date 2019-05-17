@@ -1,6 +1,5 @@
 using System;
 using Microsoft.Extensions.Logging;
-using Softplan.Common.Messaging;
 using Softplan.Common.Messaging.Abstractions;
 
 namespace rpcExample

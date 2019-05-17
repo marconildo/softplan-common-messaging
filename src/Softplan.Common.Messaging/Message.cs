@@ -8,13 +8,27 @@ namespace Softplan.Common.Messaging
 {
     public class Message : IMessage
     {
+        public string Id { get; set; }
+        public IDictionary<string, object> Headers { get; set; }
+        public string OperationId { get; set; }
+        public string ParentOperationId { get; set; }
+        public string MainOperationId { get; set; }
+        [JsonProperty("CustomParams")]
+        public LegacyCustomParams LegacyCustomParams { get; set; }
+        [JsonIgnore]
+        public IDictionary<string, string> CustomParams { get; set; }
+        public string UserId { get; set; }
+        public string Token { get; set; }
+        public string ReplyQueue { get; set; }
+        public string ReplyTo { get; set; }
+        
         public Message(IMessage parentMessage = null)
         {
             OperationId = Guid.NewGuid().ToString();
             ParentOperationId = OperationId;
             MainOperationId = OperationId;
             CustomParams = new Dictionary<string, string>();
-            OldCustomParams = new LegacyCustomParams();
+            LegacyCustomParams = new LegacyCustomParams();
             Headers = new Dictionary<string, object>();
 
             if (parentMessage != null)
@@ -22,21 +36,7 @@ namespace Softplan.Common.Messaging
                 AssignBaseMessageData(parentMessage);
             }
         }
-
-        public string Id { get; set; }
-        public IDictionary<string, object> Headers { get; set; }
-        public string OperationId { get; set; }
-        public string ParentOperationId { get; set; }
-        public string MainOperationId { get; set; }
-        [JsonProperty("CustomParams")]
-        public LegacyCustomParams OldCustomParams { get; set; }
-        [JsonIgnore]
-        public IDictionary<string, string> CustomParams { get; set; }
-        public string UserId { get; set; }
-        public string Token { get; set; }
-        public string ReplyQueue { get; set; }
-        public string ReplyTo { get; set; }
-
+        
         public void AssignBaseMessageData(IMessage baseMessage)
         {
             MainOperationId = baseMessage.MainOperationId;
@@ -51,13 +51,13 @@ namespace Softplan.Common.Messaging
         [OnSerializing()]
         private void OnSerializing(StreamingContext context)
         {
-            OldCustomParams.FromDictionary(CustomParams);
+            LegacyCustomParams.FromDictionary(CustomParams);
         }
 
         [OnDeserialized()]
         private void OnDeSerialized(StreamingContext context)
         {
-            OldCustomParams.ToDictionary(CustomParams);
+            LegacyCustomParams.ToDictionary(CustomParams);
         }
     }
 }
