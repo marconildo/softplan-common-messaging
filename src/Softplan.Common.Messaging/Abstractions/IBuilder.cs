@@ -10,6 +10,6 @@ namespace Softplan.Common.Messaging.Abstractions
         IConsumer BuildConsumer();
         ISerializer BuildSerializer();
         IMessage BuildMessage(string queue, int version, string data = null);
-        IQueueApiManager BuildAPIManager();
+        IQueueApiManager BuildApiManager();
     }
 }

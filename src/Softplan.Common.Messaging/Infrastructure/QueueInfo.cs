@@ -7,33 +7,31 @@ namespace Softplan.Common.Messaging.Infrastructure
 {
     public class QueueInfo
     {
-        const string maxPriorityHeader = "x-max-priority";
+        private const string MaxPriorityHeader = "x-max-priority";
+        
+        public bool Durable { get; set; }
+        [DataMember(Name = "auto_delete")]
+        public bool AutoDelete { get; set; }
+        public bool Exclusive { get; set; }
+        [JsonIgnore]
+        public int Priority { get; set; }
+        public IDictionary<string, object> Arguments { get; }
+        
         public QueueInfo()
         {
             Arguments = new Dictionary<string, object>();
-        }
-
-        public bool Durable { get; set; }
-
-        [DataMember(Name = "auto_delete")]
-        public bool AutoDelete { get; set; }
-
-        public bool Exclusive { get; set; }
-        [JsonIgnore]
-        public Int32 Priority { get; set; }
-
-        public IDictionary<string, object> Arguments { get; private set; }
+        }        
 
         [OnSerializing()]
         private void OnSerializing(StreamingContext context)
         {
-            Arguments[maxPriorityHeader] = Priority;
+            Arguments[MaxPriorityHeader] = Priority;
         }
 
         [OnDeserialized()]
         private void OnDeSerialized(StreamingContext context)
         {
-            Priority = Arguments.ContainsKey(maxPriorityHeader) ? Convert.ToInt32(Arguments[maxPriorityHeader]) : 0;
+            Priority = Arguments.ContainsKey(MaxPriorityHeader) ? Convert.ToInt32(Arguments[MaxPriorityHeader]) : 0;
         }
     }
 }

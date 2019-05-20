@@ -51,8 +51,8 @@ namespace Softplan.Common.Messaging.Tests
             
             manager.Start();
             
-            _loggerMock.Verify(l => l.Log(LogLevel.Information, It.IsAny<EventId>(), new FormattedLogValues(Properties.Resources.MQManagerStarting), It.IsAny<Exception>(), It.IsAny<Func<object, Exception, string>>()), Times.Once);
-            _loggerMock.Verify(l => l.Log(LogLevel.Information, It.IsAny<EventId>(), new FormattedLogValues(Properties.Resources.MQManagerStarted), It.IsAny<Exception>(), It.IsAny<Func<object, Exception, string>>()), Times.Once);
+            _loggerMock.Verify(l => l.Log(LogLevel.Information, It.IsAny<EventId>(), new FormattedLogValues(Resources.MQManagerStarting), It.IsAny<Exception>(), It.IsAny<Func<object, Exception, string>>()), Times.Once);
+            _loggerMock.Verify(l => l.Log(LogLevel.Information, It.IsAny<EventId>(), new FormattedLogValues(Resources.MQManagerStarted), It.IsAny<Exception>(), It.IsAny<Func<object, Exception, string>>()), Times.Once);
         }
         
         [Fact]
@@ -85,7 +85,7 @@ namespace Softplan.Common.Messaging.Tests
             
             manager.Start();
             
-            _loggerMock.Verify(l => l.Log(LogLevel.Information, It.IsAny<EventId>(), new FormattedLogValues(Properties.Resources.MQManagerAlreadyStarted), It.IsAny<Exception>(), It.IsAny<Func<object, Exception, string>>()), Times.Once);
+            _loggerMock.Verify(l => l.Log(LogLevel.Information, It.IsAny<EventId>(), new FormattedLogValues(Resources.MQManagerAlreadyStarted), It.IsAny<Exception>(), It.IsAny<Func<object, Exception, string>>()), Times.Once);
         }
         
         [Fact]
@@ -121,7 +121,7 @@ namespace Softplan.Common.Messaging.Tests
             
             manager.Start();
             
-            _loggerMock.Verify(l => l.Log(LogLevel.Error, It.IsAny<EventId>(), new FormattedLogValues(Properties.Resources.MQManagerErrorWhileStarting), exception, It.IsAny<Func<object, Exception, string>>()), Times.Once);            
+            _loggerMock.Verify(l => l.Log(LogLevel.Error, It.IsAny<EventId>(), new FormattedLogValues(Resources.MQManagerErrorWhileStarting), exception, It.IsAny<Func<object, Exception, string>>()), Times.Once);            
         }
         
         [Fact]
@@ -141,8 +141,8 @@ namespace Softplan.Common.Messaging.Tests
             
             manager.Stop();
             
-            _loggerMock.Verify(l => l.Log(LogLevel.Information, It.IsAny<EventId>(), new FormattedLogValues(Properties.Resources.MQManagerStopping), It.IsAny<Exception>(), It.IsAny<Func<object, Exception, string>>()), Times.Once);
-            _loggerMock.Verify(l => l.Log(LogLevel.Information, It.IsAny<EventId>(), new FormattedLogValues(Properties.Resources.MQManagerStopped), It.IsAny<Exception>(), It.IsAny<Func<object, Exception, string>>()), Times.Once);
+            _loggerMock.Verify(l => l.Log(LogLevel.Information, It.IsAny<EventId>(), new FormattedLogValues(Resources.MQManagerStopping), It.IsAny<Exception>(), It.IsAny<Func<object, Exception, string>>()), Times.Once);
+            _loggerMock.Verify(l => l.Log(LogLevel.Information, It.IsAny<EventId>(), new FormattedLogValues(Resources.MQManagerStopped), It.IsAny<Exception>(), It.IsAny<Func<object, Exception, string>>()), Times.Once);
         }
         
         [Fact]
@@ -164,7 +164,7 @@ namespace Softplan.Common.Messaging.Tests
             
             manager.Stop();
             
-            _loggerMock.Verify(l => l.Log(LogLevel.Information, It.IsAny<EventId>(), new FormattedLogValues(Properties.Resources.MQManagerNotStarted), It.IsAny<Exception>(), It.IsAny<Func<object, Exception, string>>()), Times.Once);
+            _loggerMock.Verify(l => l.Log(LogLevel.Information, It.IsAny<EventId>(), new FormattedLogValues(Resources.MQManagerNotStarted), It.IsAny<Exception>(), It.IsAny<Func<object, Exception, string>>()), Times.Once);
         }
         
         [Fact]
@@ -178,7 +178,7 @@ namespace Softplan.Common.Messaging.Tests
             
             manager.Stop();
             
-            _loggerMock.Verify(l => l.Log(LogLevel.Error, It.IsAny<EventId>(), new FormattedLogValues(Properties.Resources.MQManagerErrorWhileStopping), exception, It.IsAny<Func<object, Exception, string>>()), Times.Once);            
+            _loggerMock.Verify(l => l.Log(LogLevel.Error, It.IsAny<EventId>(), new FormattedLogValues(Resources.MQManagerErrorWhileStopping), exception, It.IsAny<Func<object, Exception, string>>()), Times.Once);            
         }
 
         [Fact]
@@ -249,8 +249,7 @@ namespace Softplan.Common.Messaging.Tests
             var manager = new MessagingManager(_builderMock.Object, _loggerFactoryMock.Object) {Active = true};
             manager.Dispose();
         }
-        
-                
+                        
 
         private static IProcessor GetProcessor<T>() where T:IProcessor
         {

@@ -45,8 +45,8 @@ namespace Softplan.Common.Messaging.Tests.AMQP
         [Fact]
         public void BuildApiManagerTest()
         {
-            var manager = builder.BuildAPIManager();
-            var manager2 = builder.BuildAPIManager();
+            var manager = builder.BuildApiManager();
+            var manager2 = builder.BuildApiManager();
             connectionMock.Setup(c => c.CreateModel()).Returns(new Mock<IModel>().Object);
             Assert.Equal(manager, manager2);
             connectionMock.Verify(c => c.CreateModel(), Times.Once());
@@ -74,8 +74,8 @@ namespace Softplan.Common.Messaging.Tests.AMQP
                 .Returns(GetMockConfigSection("http://guest:guest@locahost"));
 
             builder = new AmqpBuilder(settings.Object, loggerFactoryMock.Object, connectionFactoryMock.Object);
-            var manager = builder.BuildAPIManager();
-            Assert.IsType<RabbitMQApiManager>(manager);
+            var manager = builder.BuildApiManager();
+            Assert.IsType<RabbitMqApiManager>(manager);
         }
 
         [Fact]

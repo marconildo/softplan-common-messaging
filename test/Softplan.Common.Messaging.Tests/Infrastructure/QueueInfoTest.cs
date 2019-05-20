@@ -1,3 +1,4 @@
+using FluentAssertions;
 using Newtonsoft.Json;
 using Softplan.Common.Messaging.Infrastructure;
 using Xunit;
@@ -6,33 +7,36 @@ namespace Softplan.Common.Messaging.Tests.Infrastructure
 {
     public class QueueInfoTest
     {
-        const string queueInfoWithPriority = "{\"Durable\":false,\"AutoDelete\":false,\"Exclusive\":false,"
-            + "\"Arguments\":{\"x-max-priority\":99}}";
-        const string queueInfoWithoutPriority = "{\"Durable\":false,\"AutoDelete\":false,\"Exclusive\":false}";
+        private const string QueueInfoWithPriority = "{\"Durable\":false,\"AutoDelete\":false,\"Exclusive\":false,\"Arguments\":{\"x-max-priority\":99}}";
+        private const string QueueInfoWithoutPriority = "{\"Durable\":false,\"AutoDelete\":false,\"Exclusive\":false}";
 
         [Fact]
-        public void SerializeObject()
+        public void When_Serialize_Should_Add_Arguments_Max_Priority()
         {
             var info = new QueueInfo
             {
                 Priority = 99
             };
+            
             var serialized = JsonConvert.SerializeObject(info);
-            Assert.Equal(queueInfoWithPriority, serialized);
+            
+            serialized.Should().Be(QueueInfoWithPriority);
         }
 
         [Fact]
-        public void DeserializeObject()
+        public void When_Deserialize_With_Priority_Should_Set_Value()
         {
-            var info = JsonConvert.DeserializeObject<QueueInfo>(queueInfoWithPriority);
-            Assert.Equal(99, info.Priority);
+            var info = JsonConvert.DeserializeObject<QueueInfo>(QueueInfoWithPriority);
+
+            info.Priority.Should().Be(99);
         }
 
         [Fact]
-        public void DeserializeObjectWithoutPriority()
+        public void When_Deserialize_Without_Priority_Should_Set_To_Zero()
         {
-            var info = JsonConvert.DeserializeObject<QueueInfo>(queueInfoWithoutPriority);
-            Assert.Equal(0, info.Priority);
+            var info = JsonConvert.DeserializeObject<QueueInfo>(QueueInfoWithoutPriority);
+            
+            info.Priority.Should().Be(0);
         }
     }
 }

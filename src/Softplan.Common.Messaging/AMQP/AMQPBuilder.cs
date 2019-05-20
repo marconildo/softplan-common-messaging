@@ -28,7 +28,7 @@ namespace Softplan.Common.Messaging.AMQP
             connection = factory.CreateConnection();
         }
 
-        public IQueueApiManager BuildAPIManager()
+        public IQueueApiManager BuildApiManager()
         {
             if (apiManager != null)
             {
@@ -40,7 +40,7 @@ namespace Softplan.Common.Messaging.AMQP
             var userInfo = parser.UserInfo.Split(new[] { ':' });
             var user = userInfo.Length >= 1 && !string.IsNullOrEmpty(userInfo[0]) ? userInfo[0] : "guest";
             var password = userInfo.Length >= 2 ? userInfo[1] : "guest";
-            apiManager = new RabbitMQApiManager(appSettings.GetValue<string>("RABBIT_API_URL"),
+            apiManager = new RabbitMqApiManager(appSettings.GetValue<string>("RABBIT_API_URL"),
                 user,
                 password,
                 connection.CreateModel());
@@ -51,7 +51,7 @@ namespace Softplan.Common.Messaging.AMQP
         public IConsumer BuildConsumer()
         {
             var channel = connection.CreateModel();
-            return new AmqpConsumer(channel, InternalBuildPublisher(channel), this, BuildAPIManager());
+            return new AmqpConsumer(channel, InternalBuildPublisher(channel), this, BuildApiManager());
         }
 
         public IMessage BuildMessage(string queue, int version, string data = null)
@@ -75,7 +75,7 @@ namespace Softplan.Common.Messaging.AMQP
 
         private IPublisher InternalBuildPublisher(IModel channel)
         {
-            return new AmqpPublisher(channel, BuildSerializer(), BuildAPIManager());
+            return new AmqpPublisher(channel, BuildSerializer(), BuildApiManager());
         }
 
         #region IDisposable Support

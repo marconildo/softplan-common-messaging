@@ -54,4 +54,7 @@
     <data name="ProcessorWasIgnored" xml:space="preserve">
         <value>Processor of {0} was explicitly ignored.</value>
     </data>
+    <data name="RabbitMQAPIError" xml:space="preserve">
+        <value>Erro ao consultar API do RabbitMQ. Status {0} - {1}</value>
+    </data>
 </root>

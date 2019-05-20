@@ -4,75 +4,85 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
 using Softplan.Common.Messaging.Abstractions;
+using Softplan.Common.Messaging.Properties;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 
 namespace Softplan.Common.Messaging.Infrastructure
 {
-    public class RabbitMQApiManager : IQueueApiManager
+    public class RabbitMqApiManager : IQueueApiManager
     {
-        private readonly string url;
-        private readonly IModel channel;
-        private readonly HttpClient client;
-
-        private string GetQueueResourceUrl(string queueName, string vHost = "%2f")
+        private const string Scheme = "Basic";
+        private readonly string _url;
+        private readonly IModel _channel;
+        private readonly HttpClient _client;        
+        
+        public RabbitMqApiManager(string url, string user, string password, IModel channel, HttpClient client = null)
         {
-            return $"queues/{vHost}/{queueName}?columns=durable,auto_delete,exclusive,arguments";
-        }
-        private string GetUrl(string resourceUrl)
-        {
-            return url + resourceUrl;
-        }
-        public RabbitMQApiManager(string url, string user, string password, IModel channel, HttpClient client = null)
-        {
-            this.url = url.EndsWith("/") ? url : url + "/";
-            this.channel = channel;
-            this.client = client ?? new HttpClient();
-            this.client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
-                "Basic", Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes($"{user}:{password}"))
+            _url = url.EndsWith("/") ? url : url + "/";
+            _channel = channel;
+            _client = client ?? new HttpClient();            
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+                Scheme, Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes($"{user}:{password}"))
             );
         }
 
         public QueueInfo GetQueueInfo(string queueName)
         {
             var request = new HttpRequestMessage(HttpMethod.Get, GetUrl(GetQueueResourceUrl(queueName)));
-            var response = client.SendAsync(request).Result;
-
-            switch (response.StatusCode)
-            {
-                case HttpStatusCode.NotFound:
-                    return new QueueInfo
-                    {
-                        Durable = true,
-                        AutoDelete = false,
-                        Exclusive = false,
-                        Priority = 0
-                    };
-
-                case HttpStatusCode.OK:
-                    return JsonConvert.DeserializeObject<QueueInfo>(response.Content.ReadAsStringAsync().Result);
-
-                default:
-                    throw new HttpRequestException($"Erro ao consultar API do RabbitMQ. Status {response.StatusCode} - {response.Content.ReadAsStringAsync().Result}");
-            }
-        }
+            var response = _client.SendAsync(request).Result;
+            return ProccessResponse(response);
+        }        
 
         public string EnsureQueue(string queueName)
         {
-
             if (new Regex(@"^amq.").IsMatch(queueName))
                 return queueName;
 
             var info = GetQueueInfo(queueName);
-            var resp = channel.QueueDeclare(
-                queue: queueName,
-                durable: info.Durable,
-                exclusive: info.Exclusive,
-                autoDelete: info.AutoDelete,
-                arguments: info.Arguments
+            var resp = _channel.QueueDeclare(
+                queueName,
+                info.Durable,
+                info.Exclusive,
+                info.AutoDelete,
+                info.Arguments
             );
 
             return resp.QueueName;
+        }
+        
+        private string GetUrl(string resourceUrl)
+        {
+            return _url + resourceUrl;
+        }
+        
+        private static string GetQueueResourceUrl(string queueName, string vHost = "%2f")
+        {
+            return $"queues/{vHost}/{queueName}?columns=durable,auto_delete,exclusive,arguments";
+        }               
+        
+        private static QueueInfo ProccessResponse(HttpResponseMessage response)
+        {
+            switch (response.StatusCode)
+            {                
+                case HttpStatusCode.OK:
+                    return JsonConvert.DeserializeObject<QueueInfo>(response.Content.ReadAsStringAsync().Result);                
+                case HttpStatusCode.NotFound:
+                    return GetQueueInfo();                
+                default:
+                    throw new HttpRequestException(string.Format(Resources.RabbitMQAPIError, response.StatusCode, response.Content.ReadAsStringAsync().Result));
+            }
+        }
+
+        private static QueueInfo GetQueueInfo()
+        {
+            return new QueueInfo
+            {
+                Durable = true,
+                AutoDelete = false,
+                Exclusive = false,
+                Priority = 0
+            };
         }
     }
 }

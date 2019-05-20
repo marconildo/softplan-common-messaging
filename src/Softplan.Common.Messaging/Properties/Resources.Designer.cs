@@ -167,5 +167,14 @@ namespace Softplan.Common.Messaging.Properties {
                 return ResourceManager.GetString("ProcessorWasIgnored", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Erro ao consultar API do RabbitMQ. Status {0} - {1}.
+        /// </summary>
+        public static string RabbitMQAPIError {
+            get {
+                return ResourceManager.GetString("RabbitMQAPIError", resourceCulture);
+            }
+        }
     }
 }
