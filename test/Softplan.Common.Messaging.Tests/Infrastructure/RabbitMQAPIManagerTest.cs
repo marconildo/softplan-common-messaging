@@ -18,6 +18,7 @@ namespace Softplan.Common.Messaging.Tests.Infrastructure
     {
         private readonly Mock<IModel> _channelMock;
         private Mock<HttpMessageHandler> _httpHandlerMock;
+        private readonly MockBehavior _mockBehavior;
         
         private const string SendAsync = "SendAsync";
         private const string QueueName = "testQueueName";
@@ -31,7 +32,8 @@ namespace Softplan.Common.Messaging.Tests.Infrastructure
 
         public RabbitMqApiManagerTest()
         {
-            _channelMock = new Mock<IModel>();
+            _mockBehavior = MockBehavior.Strict;
+            _channelMock = new Mock<IModel>(_mockBehavior);
             _channelMock.Setup(chan => chan.QueueDeclare(It.IsAny<string>(), It.IsAny<bool>(),
                     It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<IDictionary<string, object>>()))
                     .Returns((string queueName, bool durable, bool exclusive, bool autoDelete, IDictionary<string, object> props) => new QueueDeclareOk(queueName, 0, 0));
@@ -168,7 +170,7 @@ namespace Softplan.Common.Messaging.Tests.Infrastructure
 
         private HttpClient GetMockHttpClient(Task<HttpResponseMessage> requestHandler, Action<HttpRequestMessage, CancellationToken> callback)
         {
-            _httpHandlerMock = new Mock<HttpMessageHandler>();            
+            _httpHandlerMock = new Mock<HttpMessageHandler>(_mockBehavior);            
             _httpHandlerMock.Protected()
                 .Setup<Task<HttpResponseMessage>>(SendAsync, ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
                 .Returns(requestHandler)
