@@ -18,13 +18,15 @@ namespace Softplan.Common.Messaging.Tests
         private readonly Mock<ILoggerFactory> _loggerFactoryMock;
         private readonly Mock<IConsumer> _consumerMock;
         private readonly Mock<ILogger> _loggerMock;
+        private readonly MockBehavior _mockBehavior;
 
         public MessagingManagerTest()
         {
-            _builderMock = new Mock<IBuilder>();            
-            _loggerFactoryMock = new Mock<ILoggerFactory>();
-            _consumerMock = new Mock<IConsumer>();
-            _loggerMock = new Mock<ILogger>();
+            _mockBehavior = MockBehavior.Strict;
+            _builderMock = new Mock<IBuilder>(_mockBehavior);            
+            _loggerFactoryMock = new Mock<ILoggerFactory>(_mockBehavior);
+            _consumerMock = new Mock<IConsumer>(_mockBehavior);
+            _loggerMock = new Mock<ILogger>(_mockBehavior);
             _consumerMock.Setup(c => c.Start(It.IsAny<IProcessor>(), It.IsAny<string>()));
             _consumerMock.Setup(c => c.Stop());
             _builderMock.Setup(b => b.BuildConsumer()).Returns(_consumerMock.Object);
@@ -217,7 +219,7 @@ namespace Softplan.Common.Messaging.Tests
         [Fact]
         public void When_LoadProcessor_Should_Log_Invalid_Processors()
         {
-            var processorIgnorerMock = new Mock<IProcessorIgnorer>();
+            var processorIgnorerMock = new Mock<IProcessorIgnorer>(_mockBehavior);
             processorIgnorerMock.Setup(i => i.ShouldIgnoreProcessorFrom(It.IsAny<Type>()))
                 .Returns((Type t) => t == typeof(TestProcessor));
             var manager = new MessagingManager(_builderMock.Object, _loggerFactoryMock.Object)

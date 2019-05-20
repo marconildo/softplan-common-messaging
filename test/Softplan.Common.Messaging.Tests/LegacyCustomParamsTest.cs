@@ -6,7 +6,6 @@ namespace Softplan.Common.Messaging.Tests
 {
     public class LegacyCustomParamsTest
     {
-
         public static IEnumerable<object[]> ToDictData()
         {
             return new List<object[]> {

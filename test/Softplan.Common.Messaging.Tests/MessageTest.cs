@@ -8,6 +8,12 @@ namespace Softplan.Common.Messaging.Tests
 {
     public class MessageTest
     {
+        private const string MsgId = "msgId";
+        private const string MsgToken = "msgToken";
+        private const string MsgUserId = "msgUserId";
+        private const string MsgReplyQueue = "msgReplyQueue";
+        private const string MsgReplyTo = "msgReplyTo";
+        
         [Fact]
         public void When_Create_Message_Without_BaseMessage_Should_Set_Expected_Values()
         {
@@ -46,21 +52,21 @@ namespace Softplan.Common.Messaging.Tests
 
         [Fact]
         public void PropertiesTest()
-        {
+        {            
             var msg = new Message
             {
-                Id = "msgId",
-                Token = "msgToken",
-                UserId = "msgUserId",
-                ReplyQueue = "msgReplyQueue",
-                ReplyTo = "msgReplyTo"
+                Id = MsgId,
+                Token = MsgToken,
+                UserId = MsgUserId,
+                ReplyQueue = MsgReplyQueue,
+                ReplyTo = MsgReplyTo
             };
 
-            Assert.Equal("msgId", msg.Id);
-            Assert.Equal("msgToken", msg.Token);
-            Assert.Equal("msgUserId", msg.UserId);
-            Assert.Equal("msgReplyQueue", msg.ReplyQueue);
-            Assert.Equal("msgReplyTo", msg.ReplyTo);
+            msg.Id.Should().Be(MsgId);
+            msg.Token.Should().Be(MsgToken);
+            msg.UserId.Should().Be(MsgUserId);
+            msg.ReplyQueue.Should().Be(MsgReplyQueue);
+            msg.ReplyTo.Should().Be(MsgReplyTo);
         }
 
         [Fact]
