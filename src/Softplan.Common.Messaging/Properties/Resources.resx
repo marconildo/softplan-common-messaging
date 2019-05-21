@@ -42,7 +42,7 @@
     <data name="MQManagerErrorWhileStopping" xml:space="preserve">
         <value>Error while stopping MQManager.</value>
     </data>
-    <data name="ErrorToCreateProcessorInstance" xml:space="preserve">
+    <data name="ProcessorInstanceCouldNotBeCreated" xml:space="preserve">
         <value>Could not create a instance of {0} processor.</value>
     </data>
     <data name="ProcessorAlreadyResgistered" xml:space="preserve">
@@ -55,6 +55,12 @@
         <value>Processor of {0} was explicitly ignored.</value>
     </data>
     <data name="RabbitMQAPIError" xml:space="preserve">
-        <value>Erro ao consultar API do RabbitMQ. Status {0} - {1}</value>
+        <value>Erro ao consultar API do RabbitMQ. Status {0} - {1}.</value>
+    </data>
+    <data name="ReplyMessageNotReceived" xml:space="preserve">
+        <value>A resposta da mensagem não foi recebida.</value>
+    </data>
+    <data name="MessageDestionationIsNull" xml:space="preserve">
+        <value>Destination cannot be empty.</value>
     </data>
 </root>

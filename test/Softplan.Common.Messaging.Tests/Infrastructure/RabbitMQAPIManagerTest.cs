@@ -9,7 +9,7 @@ using Moq;
 using Moq.Protected;
 using RabbitMQ.Client;
 using Softplan.Common.Messaging.Infrastructure;
-using Softplan.Common.Messaging.Tests.Properties;
+using Softplan.Common.Messaging.Properties;
 using Xunit;
 
 namespace Softplan.Common.Messaging.Tests.Infrastructure
@@ -83,7 +83,7 @@ namespace Softplan.Common.Messaging.Tests.Infrastructure
             
             action.Should()
                 .Throw<HttpRequestException>()
-                .WithMessage(string.Format(Resources.RabbitMQRequestError, HttpStatusCode.Unauthorized, ErrorMessage));
+                .WithMessage(string.Format(Resources.RabbitMQAPIError, HttpStatusCode.Unauthorized, ErrorMessage));
         }
 
         [Fact]
@@ -118,7 +118,7 @@ namespace Softplan.Common.Messaging.Tests.Infrastructure
             
             action.Should()
                 .Throw<HttpRequestException>()
-                .WithMessage(string.Format(Resources.RabbitMQRequestError, HttpStatusCode.Forbidden, ErrorMessage));
+                .WithMessage(string.Format(Resources.RabbitMQAPIError, HttpStatusCode.Forbidden, ErrorMessage));
         }
         
         [Fact]

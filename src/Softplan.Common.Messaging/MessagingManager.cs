@@ -192,7 +192,7 @@ namespace Softplan.Common.Messaging
         private bool ProcessorIsNull(IProcessor processor, Type type)
         {
             if (processor != null) return false;
-            _logger.LogWarning(string.Format(Resources.ErrorToCreateProcessorInstance, type));
+            _logger.LogWarning(string.Format(Resources.ProcessorInstanceCouldNotBeCreated, type));
             return true;
         }
         

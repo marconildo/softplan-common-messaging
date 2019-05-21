@@ -61,11 +61,11 @@ namespace Softplan.Common.Messaging.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Could not create a instance of {0} processor..
+        ///   Looks up a localized string similar to Destination cannot be empty..
         /// </summary>
-        public static string ErrorToCreateProcessorInstance {
+        public static string MessageDestionationIsNull {
             get {
-                return ResourceManager.GetString("ErrorToCreateProcessorInstance", resourceCulture);
+                return ResourceManager.GetString("MessageDestionationIsNull", resourceCulture);
             }
         }
         
@@ -151,6 +151,15 @@ namespace Softplan.Common.Messaging.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Could not create a instance of {0} processor..
+        /// </summary>
+        public static string ProcessorInstanceCouldNotBeCreated {
+            get {
+                return ResourceManager.GetString("ProcessorInstanceCouldNotBeCreated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Processor {0} is not a valid, public processor type..
         /// </summary>
         public static string ProcessorIsInvalid {
@@ -169,11 +178,20 @@ namespace Softplan.Common.Messaging.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Erro ao consultar API do RabbitMQ. Status {0} - {1}.
+        ///   Looks up a localized string similar to Erro ao consultar API do RabbitMQ. Status {0} - {1}..
         /// </summary>
         public static string RabbitMQAPIError {
             get {
                 return ResourceManager.GetString("RabbitMQAPIError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A resposta da mensagem não foi recebida..
+        /// </summary>
+        public static string ReplyMessageNotReceived {
+            get {
+                return ResourceManager.GetString("ReplyMessageNotReceived", resourceCulture);
             }
         }
     }

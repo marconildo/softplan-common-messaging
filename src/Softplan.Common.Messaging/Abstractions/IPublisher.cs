@@ -20,8 +20,8 @@ namespace Softplan.Common.Messaging.Abstractions
         /// <param name="message">Mensagem a ser publicada no Broker</param>
         /// <param name="destination">Fila de destino para a mensagem</param>
         /// <param name="forceDestination">Caso seja True, irá ignorar informações de destino presentes na Mensagem</param>
-        /// <param name="millisecodsTimeout">Tempo máximo para aguarda a resposta.</param>
+        /// <param name="milliSecondsTimeout">Tempo máximo para aguarda a resposta.</param>
         /// <returns>Retorna a Mensagem de resposta da operação publicada</returns>
-        Task<T> PublishAndWait<T>(IMessage message, string destination = "", bool forceDestination = false, int millisecodsTimeout = 60000) where T : IMessage;
+        Task<T> PublishAndWait<T>(IMessage message, string destination = "", bool forceDestination = false, int milliSecondsTimeout = 60000) where T : IMessage;
     }
 }

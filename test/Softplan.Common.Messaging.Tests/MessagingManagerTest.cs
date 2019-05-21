@@ -230,7 +230,7 @@ namespace Softplan.Common.Messaging.Tests
             manager.LoadProcessors(new Mock<IServiceProvider>().Object);
             
             _loggerMock.Verify(l => l.Log(LogLevel.Debug, It.IsAny<EventId>(), new FormattedLogValues(string.Format(Resources.ProcessorIsInvalid, typeof(AbstractTestProcessor))), It.IsAny<Exception>(), It.IsAny<Func<object, Exception, string>>()), Times.Once);
-            _loggerMock.Verify(l => l.Log(LogLevel.Warning, It.IsAny<EventId>(), new FormattedLogValues(string.Format(Resources.ErrorToCreateProcessorInstance, typeof(InvalidConstructorProcessor))), It.IsAny<Exception>(), It.IsAny<Func<object, Exception, string>>()), Times.Once);
+            _loggerMock.Verify(l => l.Log(LogLevel.Warning, It.IsAny<EventId>(), new FormattedLogValues(string.Format(Resources.ProcessorInstanceCouldNotBeCreated, typeof(InvalidConstructorProcessor))), It.IsAny<Exception>(), It.IsAny<Func<object, Exception, string>>()), Times.Once);
             _loggerMock.Verify(l => l.Log(LogLevel.Debug, It.IsAny<EventId>(), new FormattedLogValues(string.Format(Resources.ProcessorWasIgnored, typeof(TestProcessor))), It.IsAny<Exception>(), It.IsAny<Func<object, Exception, string>>()), Times.Once);
         }
         
