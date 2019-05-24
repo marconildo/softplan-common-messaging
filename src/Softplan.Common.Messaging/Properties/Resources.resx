@@ -63,4 +63,10 @@
     <data name="MessageDestionationIsNull" xml:space="preserve">
         <value>Destination cannot be empty.</value>
     </data>
+    <data name="NomedaFilaNaoInformado" xml:space="preserve">
+        <value>Nome da fila não informado.</value>
+    </data>
+    <data name="ConsumerJainiciado" xml:space="preserve">
+        <value>"Consumer já iniciado."</value>
+    </data>
 </root>

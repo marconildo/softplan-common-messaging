@@ -1,84 +1,97 @@
 using System;
-using RabbitMQ.Client;
-using Softplan.Common.Messaging.Abstractions;
-using RabbitMQ.Client.Events;
 using System.Text;
+using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
+using Softplan.Common.Messaging.Abstractions;
+using Softplan.Common.Messaging.Properties;
 
 namespace Softplan.Common.Messaging.AMQP
 {
     public class AmqpConsumer : IConsumer
     {
-        private readonly IModel channel;
-        private readonly IPublisher publisher;
-        private readonly IBuilder builder;
-        private readonly IQueueApiManager manager;
+        private readonly IModel _channel;
+        private readonly IPublisher _publisher;
+        private readonly IBuilder _builder;
+        private readonly IQueueApiManager _manager;
         public string ConsumerTag { get; private set; }
+        
+        private const string ParamName = "queue";
 
         public AmqpConsumer(IModel channel, IPublisher publisher, IBuilder builder, IQueueApiManager manager)
         {
-            this.channel = channel ?? throw new ArgumentNullException(nameof(channel));
-            this.publisher = publisher ?? throw new ArgumentNullException(nameof(publisher));
-            this.builder = builder ?? throw new ArgumentNullException(nameof(builder));
-            this.manager = manager ?? throw new ArgumentNullException(nameof(manager));
+            _channel = channel ?? throw new ArgumentNullException(nameof(channel));
+            _publisher = publisher ?? throw new ArgumentNullException(nameof(publisher));
+            _builder = builder ?? throw new ArgumentNullException(nameof(builder));
+            _manager = manager ?? throw new ArgumentNullException(nameof(manager));
+            ConsumerTag = string.Empty;
         }
 
         public void Start(IProcessor processor, string queue)
         {
-            if (!string.IsNullOrEmpty(ConsumerTag))
-                throw new InvalidOperationException("Consumer já iniciado.");
-
-            if (string.IsNullOrEmpty(queue))
-                throw new ArgumentNullException("queue","Nome da fila não informado");
-
-            manager.EnsureQueue(queue);
-            channel.BasicQos(0, 1, false);
-
-            var consumer = new EventingBasicConsumer(channel);
+            ValidateConsumerStarted();
+            ValidateStackName(queue);
+            _manager.EnsureQueue(queue);
+            _channel.BasicQos(0, 1, false);
+            var consumer = new EventingBasicConsumer(_channel);
             consumer.Received += (channel, args) => OnMessageReceived(processor, queue, args);
-
-            ConsumerTag = channel.BasicConsume(
-                queue: queue,
-                autoAck: false,
-                consumer: consumer
-            );
+            ConsumerTag = _channel.BasicConsume(queue, false, consumer);
+        }   
+        
+        public void Stop()
+        {
+            if (!string.IsNullOrEmpty(ConsumerTag))
+                _channel.BasicCancel(ConsumerTag);
+            ConsumerTag = string.Empty;
         }
+        
 
         protected void OnMessageReceived(IProcessor processor, string queue, BasicDeliverEventArgs args)
         {
-            var message = builder.BuildMessage(queue, 1, Encoding.UTF8.GetString(args.Body));
+            var message = _builder.BuildMessage(queue, 1, Encoding.UTF8.GetString(args.Body));
             try
             {
-                if (!String.IsNullOrEmpty(args.BasicProperties.ReplyTo))
-                    message.ReplyQueue = args.BasicProperties.ReplyTo;
-
-                processor.ProcessMessage(message, publisher);
-                channel.BasicAck(args.DeliveryTag, false);
+                SetReplyQueue(args, message);
+                processor.ProcessMessage(message, _publisher);
+                _channel.BasicAck(args.DeliveryTag, false);
             }
-            catch (Exception err)
+            catch (Exception ex)
             {
-                try
-                {
-                    if (processor.HandleProcessError(message, publisher, err))
-                        channel.BasicAck(args.DeliveryTag, false);
-                    else
-                        channel.BasicNack(args.DeliveryTag, false, true);
-                }
-                catch
-                {
-                    channel.BasicNack(args.DeliveryTag, false, true);
-                }
+                ProccessException(processor, args, message, ex);
             }
+        }        
 
-        }
 
-        public void Stop()
+        private void ValidateConsumerStarted()
         {
-            if (!String.IsNullOrEmpty(ConsumerTag))
-                channel.BasicCancel(ConsumerTag);
-
-            ConsumerTag = string.Empty;
+            if (!string.IsNullOrEmpty(ConsumerTag))
+                throw new InvalidOperationException(Resources.ConsumerJainiciado);
         }
-
-
+        
+        private static void ValidateStackName(string queue)
+        {
+            if (string.IsNullOrEmpty(queue))
+                throw new ArgumentNullException(ParamName, Resources.NomedaFilaNaoInformado);
+        }        
+        
+        private static void SetReplyQueue(BasicDeliverEventArgs args, IMessage message)
+        {
+            if (!string.IsNullOrEmpty(args.BasicProperties.ReplyTo))
+                message.ReplyQueue = args.BasicProperties.ReplyTo;
+        }
+        
+        private void ProccessException(IProcessor processor, BasicDeliverEventArgs args, IMessage message, Exception ex)
+        {
+            try
+            {
+                if (processor.HandleProcessError(message, _publisher, ex))
+                    _channel.BasicAck(args.DeliveryTag, false);
+                else
+                    _channel.BasicNack(args.DeliveryTag, false, true);
+            }
+            catch
+            {
+                _channel.BasicNack(args.DeliveryTag, false, true);
+            }
+        }
     }
 }

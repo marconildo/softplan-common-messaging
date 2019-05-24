@@ -61,6 +61,15 @@ namespace Softplan.Common.Messaging.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &quot;Consumer já iniciado.&quot;.
+        /// </summary>
+        public static string ConsumerJainiciado {
+            get {
+                return ResourceManager.GetString("ConsumerJainiciado", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Destination cannot be empty..
         /// </summary>
         public static string MessageDestionationIsNull {
@@ -138,6 +147,15 @@ namespace Softplan.Common.Messaging.Properties {
         public static string MQManagerStopping {
             get {
                 return ResourceManager.GetString("MQManagerStopping", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Nome da fila não informado..
+        /// </summary>
+        public static string NomedaFilaNaoInformado {
+            get {
+                return ResourceManager.GetString("NomedaFilaNaoInformado", resourceCulture);
             }
         }
         
