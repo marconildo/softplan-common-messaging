@@ -61,6 +61,15 @@ namespace Softplan.Common.Messaging.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &quot;Creating a new API Manager instance.&quot;.
+        /// </summary>
+        public static string APIManagerCreating {
+            get {
+                return ResourceManager.GetString("APIManagerCreating", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &quot;Consumer já iniciado.&quot;.
         /// </summary>
         public static string ConsumerJainiciado {

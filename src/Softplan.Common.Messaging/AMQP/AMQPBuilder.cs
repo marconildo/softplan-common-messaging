@@ -1,56 +1,55 @@
-using Softplan.Common.Messaging.Abstractions;
-using Softplan.Common.Messaging.Infrastructure;
+using System;
+using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
-using System;
-using System.Collections.Generic;
+using Softplan.Common.Messaging.Abstractions;
+using Softplan.Common.Messaging.Infrastructure;
+using Softplan.Common.Messaging.Properties;
 
 namespace Softplan.Common.Messaging.AMQP
 {
     public class AmqpBuilder : IBuilder, IDisposable
     {
-        private readonly IConfiguration appSettings;
-        private readonly ILogger logger;
-        private readonly IConnection connection;
-        private IQueueApiManager apiManager;
+        private readonly IConfiguration _appSettings;
+        private readonly ILogger _logger;
+        private readonly IConnection _connection;
+        private IQueueApiManager _apiManager;
 
-        public IDictionary<string, Type> MessageQueueMap { get; private set; }
+        public IDictionary<string, Type> MessageQueueMap { get; }
+        
+        private const string RabbitUrlKey = "RABBIT_URL";
+        private const string RabbitApiUrlKey = "RABBIT_API_URL";
 
         public AmqpBuilder(IConfiguration appSettings, ILoggerFactory loggerFactory, IConnectionFactory connectionFactory = null)
         {
-            this.appSettings = appSettings;
-            logger = loggerFactory.CreateLogger<AmqpBuilder>();
+            _appSettings = appSettings;
+            _logger = loggerFactory.CreateLogger<AmqpBuilder>();
 
             MessageQueueMap = new Dictionary<string, Type>();
-            var factory = connectionFactory ?? new ConnectionFactory() { Uri = new Uri(appSettings.GetValue<string>("RABBIT_URL")) };
+            var factory = connectionFactory ?? new ConnectionFactory { Uri = new Uri(appSettings.GetValue<string>(RabbitUrlKey)) };
 
-            connection = factory.CreateConnection();
+            _connection = factory.CreateConnection();
         }
 
         public IQueueApiManager BuildApiManager()
         {
-            if (apiManager != null)
-            {
-                return apiManager;
-            }
+            if (_apiManager != null)
+                return _apiManager;
 
-            logger.LogTrace("Creating a new API Manager instance.");
-            var parser = new Uri(appSettings.GetValue<string>("RABBIT_API_URL"));
-            var userInfo = parser.UserInfo.Split(new[] { ':' });
+            _logger.LogTrace(Resources.APIManagerCreating);
+            var parser = new Uri(_appSettings.GetValue<string>(RabbitApiUrlKey));
+            var userInfo = parser.UserInfo.Split(':');
             var user = userInfo.Length >= 1 && !string.IsNullOrEmpty(userInfo[0]) ? userInfo[0] : "guest";
             var password = userInfo.Length >= 2 ? userInfo[1] : "guest";
-            apiManager = new RabbitMqApiManager(appSettings.GetValue<string>("RABBIT_API_URL"),
-                user,
-                password,
-                connection.CreateModel());
+            _apiManager = new RabbitMqApiManager(_appSettings.GetValue<string>(RabbitApiUrlKey), user, password, _connection.CreateModel());
 
-            return apiManager;
+            return _apiManager;
         }
 
         public IConsumer BuildConsumer()
         {
-            var channel = connection.CreateModel();
+            var channel = _connection.CreateModel();
             return new AmqpConsumer(channel, InternalBuildPublisher(channel), this, BuildApiManager());
         }
 
@@ -65,7 +64,7 @@ namespace Softplan.Common.Messaging.AMQP
 
         public IPublisher BuildPublisher()
         {
-            return InternalBuildPublisher(connection.CreateModel());
+            return InternalBuildPublisher(_connection.CreateModel());
         }
 
         public ISerializer BuildSerializer()
@@ -87,7 +86,7 @@ namespace Softplan.Common.Messaging.AMQP
             {
                 if (disposing)
                 {
-                    connection.Close();
+                    _connection.Close();
                 }
 
                 disposedValue = true;

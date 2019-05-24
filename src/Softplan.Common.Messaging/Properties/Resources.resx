@@ -69,4 +69,7 @@
     <data name="ConsumerJainiciado" xml:space="preserve">
         <value>"Consumer já iniciado."</value>
     </data>
+    <data name="APIManagerCreating" xml:space="preserve">
+        <value>"Creating a new API Manager instance."</value>
+    </data>
 </root>
