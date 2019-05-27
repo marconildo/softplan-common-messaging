@@ -10,7 +10,7 @@ namespace Softplan.Common.Messaging.Tests.TestProcessors
 
         public InvalidConstructorProcessor(int invalidArg)
         {
-            this._invalidArg = invalidArg;
+            _invalidArg = invalidArg;
         }
 
         public ILogger Logger { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }

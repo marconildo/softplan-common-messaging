@@ -10,16 +10,19 @@ namespace webapi.Controllers
     public class FibonacciController : ControllerBase
     {
         private readonly IPublisher _publisher;
+        
+        private const string TestFibonacci = "";
+        
         public FibonacciController(IPublisher publisher)
         {
-            this._publisher = publisher;
+            _publisher = publisher;
         }
 
         // GET api/values5
         [HttpGet("{number}")]
         public async Task<ActionResult<int>> Get(int number)
-        {
-            var response = await _publisher.PublishAndWait<FibMessage>(new FibMessage { Number = number }, "test.fibonacci");
+        {            
+            var response = await _publisher.PublishAndWait<FibMessage>(new FibMessage { Number = number }, TestFibonacci);
             return Ok(response.Number);
 
         }
