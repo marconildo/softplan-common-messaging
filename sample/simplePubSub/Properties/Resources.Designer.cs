@@ -39,7 +39,7 @@ namespace rpcExample.Properties {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("rpcExample.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("simplePubSub.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -57,6 +57,69 @@ namespace rpcExample.Properties {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Aplicação encerrada com sucesso..
+        /// </summary>
+        public static string AplicacaoEncerrada {
+            get {
+                return ResourceManager.GetString("AplicacaoEncerrada", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Erro ao executar aplicação. Detalhes: ${0}.
+        /// </summary>
+        public static string ErroAoExecutarAplicacao {
+            get {
+                return ResourceManager.GetString("ErroAoExecutarAplicacao", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to It failed :(.
+        /// </summary>
+        public static string Falha {
+            get {
+                return ResourceManager.GetString("Falha", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Iniciando aplicação.
+        /// </summary>
+        public static string IniciandoAplicacao {
+            get {
+                return ResourceManager.GetString("IniciandoAplicacao", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to [.] Publicando mensagem para [testQueue123] ....
+        /// </summary>
+        public static string PublicandoMensagem {
+            get {
+                return ResourceManager.GetString("PublicandoMensagem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Rodando aplicação. Pressione (enter) para encerrar..
+        /// </summary>
+        public static string RodandoAplicacao {
+            get {
+                return ResourceManager.GetString("RodandoAplicacao", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} - It works :-D !.
+        /// </summary>
+        public static string Sucesso {
+            get {
+                return ResourceManager.GetString("Sucesso", resourceCulture);
             }
         }
     }

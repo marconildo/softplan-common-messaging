@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 
 <root>
     <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
@@ -18,4 +18,25 @@
     <resheader name="writer">
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
+    <data name="Falha" xml:space="preserve">
+        <value>It failed :(</value>
+    </data>
+    <data name="Sucesso" xml:space="preserve">
+        <value>{0} - It works :-D !</value>
+    </data>
+    <data name="IniciandoAplicacao" xml:space="preserve">
+        <value>Iniciando aplicação</value>
+    </data>
+    <data name="PublicandoMensagem" xml:space="preserve">
+        <value>[.] Publicando mensagem para [testQueue123] ...</value>
+    </data>
+    <data name="RodandoAplicacao" xml:space="preserve">
+        <value>Rodando aplicação. Pressione (enter) para encerrar.</value>
+    </data>
+    <data name="AplicacaoEncerrada" xml:space="preserve">
+        <value>Aplicação encerrada com sucesso.</value>
+    </data>
+    <data name="ErroAoExecutarAplicacao" xml:space="preserve">
+        <value>Erro ao executar aplicação. Detalhes: ${0}</value>
+    </data>
 </root>
