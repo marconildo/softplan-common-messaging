@@ -5,55 +5,65 @@ using Softplan.Common.Messaging.AMQP;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using System.IO;
+using rpcExample.Properties;
 
 namespace rpcExample
 {
     class Program
     {
+        private const string AppSettingsJson = "appsettings.json";
+        private const string TestFibonacci = "test.fibonacci";
+        private const string Quit = "quit";
+        
         private static IConfiguration GetConfiguration()
-        {
+        {            
             var builder = new ConfigurationBuilder()
                            .SetBasePath(Directory.GetCurrentDirectory())
-                           .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                           .AddJsonFile(AppSettingsJson, optional: true, reloadOnChange: true)
                            .AddEnvironmentVariables();
 
             return builder.Build();
         }
+        
         static void Main(string[] args)
         {
-            Console.WriteLine("Iniciando aplicação");
+            Console.WriteLine(Resources.IniciandoAplicacao);
             try
             {
                 ILoggerFactory factory = new LoggerFactory();
-
                 IBuilder builder = new AmqpBuilder(GetConfiguration(), factory);
-                var manager = new MessagingManager(builder, factory);
-                var publisher = builder.BuildPublisher();
-
+                var publisher = builder.BuildPublisher();                
+                var manager = new MessagingManager(builder, factory);               
                 manager.LoadProcessors(null);
-                manager.Start();
-                Console.WriteLine("[.] Publicando mensagem para [testQueue123] ...");
-                Console.WriteLine("Rodando aplicação. Digite (quit) para encerrar ou qualquer numero apra calcular Fibonacci.");
-                while (true)
-                {
-                    var value = Console.ReadLine();
-                    if (value == "quit") break;
-                    if (!Int32.TryParse(value, out int fibNum))
-                        Console.WriteLine($"{value} não é um inteiro válido");
-
-                    var reply = publisher.PublishAndWait<FibMessage>(new FibMessage() { Number = fibNum }, "test.fibonacci").Result;
-                    if (String.IsNullOrEmpty(reply.ErrorMessage))
-                        Console.WriteLine($"Fibonacci para {fibNum} é igual a {reply.Number}");
-                    else
-                        Console.WriteLine($"Erro ao calcular fibonacci: {reply.ErrorMessage}");
-                }
-
+                manager.Start();               
+                PubliqueMensagem(publisher);
                 manager.Stop();
-                Console.WriteLine("Aplicação encerrada com sucesso.");
+                Console.WriteLine(Resources.AplicacaoEncerrada);
             }
             catch (Exception err)
             {
-                Console.WriteLine($"Erro ao executar aplicação. Detalhes: ${err.Message}");
+                Console.WriteLine(Resources.ErroAoExecutarAplicacao, err.Message);
+            }
+        }
+
+        private static void PubliqueMensagem(IPublisher publisher)
+        {
+            Console.WriteLine(Resources.PublicandoMensagem);
+            Console.WriteLine(Resources.RodandoAplicacao);
+            while (true)
+            {
+                var value = Console.ReadLine();
+                if (value == Quit) break;
+                if (!int.TryParse(value, out var fibNum))
+                {
+                    Console.WriteLine(Resources.InteiroInvalido, value);
+                    continue;
+                }
+
+                var reply = publisher.PublishAndWait<FibMessage>(new FibMessage() {Number = fibNum}, TestFibonacci).Result;
+                Console.WriteLine(string.IsNullOrEmpty(reply.ErrorMessage)
+                    ? string.Format(Resources.ResultadoFibonacci, fibNum, reply.Number)
+                    : string.Format(Resources.ErroCalcularFibonacci, reply.ErrorMessage));
             }
         }
     }

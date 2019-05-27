@@ -12,13 +12,8 @@ namespace rpcExample
         {
             publisher.Publish(new FibMessage(message) { ErrorMessage = error.Message });
             return true;
-        }
-
-        private int CalculateFib(int number)
-        {
-            if (number == 0 || number == 1) return number;
-            return CalculateFib(number - 1) + CalculateFib(number - 2);
-        }
+        }        
+        
         public void ProcessMessage(IMessage message, IPublisher publisher)
         {
             var number = ((FibMessage)message).Number;
@@ -36,6 +31,12 @@ namespace rpcExample
         public Type GetMessageType()
         {
             return typeof(FibMessage);
+        }
+        
+        private static int CalculateFib(int number)
+        {
+            if (number == 0 || number == 1) return number;
+            return CalculateFib(number - 1) + CalculateFib(number - 2);
         }
     }
 }

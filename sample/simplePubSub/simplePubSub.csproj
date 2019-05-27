@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Softplan.Common.Messaging\Softplan.Common.Messaging.csproj" />
@@ -24,4 +24,11 @@
     <Copy SourceFiles="appsettings.json" DestinationFolder="$(PublishDir)" />
   </Target>
 
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
 </Project>
