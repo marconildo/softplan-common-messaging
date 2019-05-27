@@ -13,6 +13,7 @@ namespace Softplan.Common.Messaging.Infrastructure
     public class RabbitMqApiManager : IQueueApiManager
     {
         private const string Scheme = "Basic";
+        private const string QueryString = "columns=durable,auto_delete,exclusive,arguments";
         private readonly string _url;
         private readonly IModel _channel;
         private readonly HttpClient _client;        
@@ -58,7 +59,7 @@ namespace Softplan.Common.Messaging.Infrastructure
         
         private static string GetQueueResourceUrl(string queueName, string vHost = "%2f")
         {
-            return $"queues/{vHost}/{queueName}?columns=durable,auto_delete,exclusive,arguments";
+            return $"queues/{vHost}/{queueName}?{QueryString}";
         }               
         
         private static QueueInfo ProccessResponse(HttpResponseMessage response)

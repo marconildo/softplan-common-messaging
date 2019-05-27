@@ -169,6 +169,15 @@ namespace Softplan.Common.Messaging.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &quot;Não existe nenhuma mensagem mapeada para a fila {0}.&quot;.
+        /// </summary>
+        public static string NoMessagesMappedToQueue {
+            get {
+                return ResourceManager.GetString("NoMessagesMappedToQueue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Processor {0} is already registered..
         /// </summary>
         public static string ProcessorAlreadyResgistered {

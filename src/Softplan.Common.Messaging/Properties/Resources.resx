@@ -72,4 +72,7 @@
     <data name="APIManagerCreating" xml:space="preserve">
         <value>"Creating a new API Manager instance."</value>
     </data>
+    <data name="NoMessagesMappedToQueue" xml:space="preserve">
+        <value>"Não existe nenhuma mensagem mapeada para a fila {0}."</value>
+    </data>
 </root>

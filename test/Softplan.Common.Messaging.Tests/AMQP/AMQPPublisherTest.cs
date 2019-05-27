@@ -169,6 +169,20 @@ namespace Softplan.Common.Messaging.Tests.AMQP
         }
         
         [Fact]
+        public void When_PublishAndWait_Should_Call_BasicConsume()
+        {            
+            try
+            {
+                var message = GetMessage();
+                _publisher.PublishAndWait<Message>(message.Object, NewTestQueue, true, 10);
+            }
+            catch (Exception e)
+            {
+                _channelMock.Verify(c => c.BasicConsume(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(),It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<IDictionary<string, object>>(), It.IsAny<IBasicConsumer>()), Times.Once);
+            }                        
+        }
+        
+        [Fact]
         public void When_PublishAndWait_And_Not_Receive_Response_In_Time_Should_Return_TimeOut()
         {
             var message = GetMessage();                       

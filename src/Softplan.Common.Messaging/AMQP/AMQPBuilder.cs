@@ -20,6 +20,7 @@ namespace Softplan.Common.Messaging.AMQP
         
         private const string RabbitUrlKey = "RABBIT_URL";
         private const string RabbitApiUrlKey = "RABBIT_API_URL";
+        private const string Guest = "guest";
 
         public AmqpBuilder(IConfiguration appSettings, ILoggerFactory loggerFactory, IConnectionFactory connectionFactory = null)
         {
@@ -38,14 +39,13 @@ namespace Softplan.Common.Messaging.AMQP
                 return _apiManager;
 
             _logger.LogTrace(Resources.APIManagerCreating);
-            var parser = new Uri(_appSettings.GetValue<string>(RabbitApiUrlKey));
-            var userInfo = parser.UserInfo.Split(':');
-            var user = userInfo.Length >= 1 && !string.IsNullOrEmpty(userInfo[0]) ? userInfo[0] : "guest";
-            var password = userInfo.Length >= 2 ? userInfo[1] : "guest";
-            _apiManager = new RabbitMqApiManager(_appSettings.GetValue<string>(RabbitApiUrlKey), user, password, _connection.CreateModel());
+            var url = _appSettings.GetValue<string>(RabbitApiUrlKey);            
+            var (user, password) = GetUserData(url);
+            var channel = _connection.CreateModel();
+            _apiManager = new RabbitMqApiManager(url, user, password, channel);
 
             return _apiManager;
-        }
+        }        
 
         public IConsumer BuildConsumer()
         {
@@ -57,7 +57,7 @@ namespace Softplan.Common.Messaging.AMQP
         {
             if (!MessageQueueMap.ContainsKey(queue))
             {
-                throw new KeyNotFoundException($"Não existe nenhuma mensagem mapeada para a fila {queue}");
+                throw new KeyNotFoundException(string.Format(Resources.NoMessagesMappedToQueue, queue));
             }
             return BuildSerializer().Deserialize(MessageQueueMap[queue], data);
         }
@@ -75,6 +75,15 @@ namespace Softplan.Common.Messaging.AMQP
         private IPublisher InternalBuildPublisher(IModel channel)
         {
             return new AmqpPublisher(channel, BuildSerializer(), BuildApiManager());
+        }
+        
+        private static (string, string) GetUserData(string url)
+        {
+            var parser = new Uri(url);
+            var userInfo = parser.UserInfo.Split(':');
+            var user = userInfo.Length >= 1 && !string.IsNullOrEmpty(userInfo[0]) ? userInfo[0] : Guest;
+            var password = userInfo.Length >= 2 ? userInfo[1] : Guest;
+            return (user, password);
         }
 
         #region IDisposable Support
