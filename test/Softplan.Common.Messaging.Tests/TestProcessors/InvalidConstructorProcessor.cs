@@ -1,16 +1,16 @@
 using System;
-using Softplan.Common.Messaging.Abstractions;
 using Microsoft.Extensions.Logging;
+using Softplan.Common.Messaging.Abstractions;
 
-namespace Softplan.Common.Messaging.UnitTest.TestProcessors
+namespace Softplan.Common.Messaging.Tests.TestProcessors
 {
     public class InvalidConstructorProcessor : IProcessor
     {
-        private readonly int invalidArg;
+        private readonly int _invalidArg;
 
         public InvalidConstructorProcessor(int invalidArg)
         {
-            this.invalidArg = invalidArg;
+            _invalidArg = invalidArg;
         }
 
         public ILogger Logger { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }

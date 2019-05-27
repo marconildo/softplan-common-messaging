@@ -4,24 +4,29 @@ using Microsoft.Extensions.Configuration;
 using Softplan.Common.Messaging.Abstractions;
 using Softplan.Common.Messaging.AMQP;
 using System.IO;
+using rpcExample.Properties;
 using Softplan.Common.Messaging;
 
 namespace simplePubSub
 {
     class Program
     {
+        private const string AppSettingsJson = "appsettings.json";
+        private const string ItsWorking = "It's working";
+        private const string Queue = "testQueue123";
+        
         private static IConfiguration GetConfiguration()
-        {
+        {            
             var builder = new ConfigurationBuilder()
                            .SetBasePath(Directory.GetCurrentDirectory())
-                           .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                           .AddJsonFile(AppSettingsJson, optional: true, reloadOnChange: true)
                            .AddEnvironmentVariables();
 
             return builder.Build();
         }
         static void Main(string[] args)
         {
-            Console.WriteLine("Iniciando aplicação");
+            Console.WriteLine(Resources.IniciandoAplicacao);
             try
             {
                 ILoggerFactory factory = new LoggerFactory();
@@ -34,17 +39,17 @@ namespace simplePubSub
 
                     manager.LoadProcessors(null);
                     manager.Start();
-                    Console.WriteLine("[.] Publicando mensagem para [testQueue123] ...");
-                    publisher.Publish(new ExampleMessage() { Text = "It's working" }, "testQueue123");
-                    Console.WriteLine("Rodando aplicação. Pressione (enter) para encerrar.");
+                    Console.WriteLine(Resources.PublicandoMensagem);                    
+                    publisher.Publish(new ExampleMessage() { Text = ItsWorking }, Queue);
+                    Console.WriteLine(Resources.RodandoAplicacao);
                     Console.ReadLine();
                     manager.Stop();
-                    Console.WriteLine("Aplicação encerrada com sucesso.");
+                    Console.WriteLine(Resources.AplicacaoEncerrada);
                 }
             }
             catch (Exception err)
             {
-                Console.WriteLine($"Erro ao executar aplicação. Detalhes: ${err.Message}");
+                Console.WriteLine(Resources.ErroAoExecutarAplicacao, err.Message);
             }
         }
     }

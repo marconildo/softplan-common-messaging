@@ -1,11 +1,14 @@
 using System;
 using Microsoft.Extensions.Logging;
+using rpcExample.Properties;
 using Softplan.Common.Messaging.Abstractions;
 
 namespace simplePubSub
 {
     public class ExampleProcessor : IProcessor
     {
+        private const string QueueName = "testQueue123";
+        
         public ILogger Logger { get; set; }
 
         public Type GetMessageType()
@@ -14,19 +17,19 @@ namespace simplePubSub
         }
 
         public string GetQueueName()
-        {
-            return "testQueue123";
+        {            
+            return QueueName;
         }
 
         public bool HandleProcessError(IMessage message, IPublisher publisher, Exception error)
         {
-            Console.WriteLine("It failed :(");
+            Console.WriteLine(Resources.Falha);
             return true;
         }
 
         public void ProcessMessage(IMessage message, IPublisher publisher)
         {
-            Console.WriteLine($"{((ExampleMessage)message).Text} - It works :-D !");
+            Console.WriteLine(Resources.Sucesso, ((ExampleMessage)message).Text);
         }
 
     }

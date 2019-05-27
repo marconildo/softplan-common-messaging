@@ -1,8 +1,8 @@
 using System;
-using Softplan.Common.Messaging.Abstractions;
 using Microsoft.Extensions.Logging;
+using Softplan.Common.Messaging.Abstractions;
 
-namespace Softplan.Common.Messaging.UnitTest
+namespace Softplan.Common.Messaging.Tests.TestProcessors
 {
     public abstract class AbstractTestProcessor : IProcessor
     {

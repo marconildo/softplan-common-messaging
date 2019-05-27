@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
@@ -18,7 +19,7 @@ namespace Softplan.Common.Messaging
             dict.Clear();
             foreach (var value in Items)
             {
-                var index = value.IndexOf("=");
+                var index = value.IndexOf("=", StringComparison.Ordinal);
                 if (index >= 0)
                 {
                     dict[value.Substring(0, index)] = value.Substring(index + 1);

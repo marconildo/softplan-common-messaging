@@ -1,85 +1,93 @@
-using Softplan.Common.Messaging.Abstractions;
-using Softplan.Common.Messaging.Infrastructure;
+using System;
+using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
-using System;
-using System.Collections.Generic;
+using Softplan.Common.Messaging.Abstractions;
+using Softplan.Common.Messaging.Infrastructure;
+using Softplan.Common.Messaging.Properties;
 
 namespace Softplan.Common.Messaging.AMQP
 {
     public class AmqpBuilder : IBuilder, IDisposable
     {
-        private readonly IConfiguration appSettings;
-        private readonly ILogger logger;
-        private readonly IConnection connection;
-        private IQueueApiManager apiManager = null;
+        private readonly IConfiguration _appSettings;
+        private readonly ILogger _logger;
+        private readonly IConnection _connection;
+        private IQueueApiManager _apiManager;
 
-        public IDictionary<string, Type> MessageQueueMap { get; private set; }
+        public IDictionary<string, Type> MessageQueueMap { get; }
+        
+        private const string RabbitUrlKey = "RABBIT_URL";
+        private const string RabbitApiUrlKey = "RABBIT_API_URL";
+        private const string Guest = "guest";
 
         public AmqpBuilder(IConfiguration appSettings, ILoggerFactory loggerFactory, IConnectionFactory connectionFactory = null)
         {
-            this.appSettings = appSettings;
-            logger = loggerFactory.CreateLogger<AmqpBuilder>();
+            _appSettings = appSettings;
+            _logger = loggerFactory.CreateLogger<AmqpBuilder>();
 
             MessageQueueMap = new Dictionary<string, Type>();
-            var factory = connectionFactory ?? new ConnectionFactory() { Uri = new Uri(appSettings.GetValue<string>("RABBIT_URL")) };
+            var factory = connectionFactory ?? new ConnectionFactory { Uri = new Uri(appSettings.GetValue<string>(RabbitUrlKey)) };
 
-            this.connection = factory.CreateConnection();
+            _connection = factory.CreateConnection();
         }
 
-        public IQueueApiManager BuildAPIManager()
+        public IQueueApiManager BuildApiManager()
         {
-            if (apiManager != null)
-            {
-                return apiManager;
-            }
+            if (_apiManager != null)
+                return _apiManager;
 
-            logger.LogTrace("Creating a new API Manager instance.");
-            var parser = new Uri(this.appSettings.GetValue<string>("RABBIT_API_URL"));
-            var userInfo = parser.UserInfo.Split(new[] { ':' });
-            var user = userInfo.Length >= 1 && !string.IsNullOrEmpty(userInfo[0]) ? userInfo[0] : "guest";
-            var password = userInfo.Length >= 2 ? userInfo[1] : "guest";
-            apiManager = new RabbitMQApiManager(this.appSettings.GetValue<string>("RABBIT_API_URL"),
-                user,
-                password,
-                connection.CreateModel());
+            _logger.LogTrace(Resources.APIManagerCreating);
+            var url = _appSettings.GetValue<string>(RabbitApiUrlKey);            
+            var (user, password) = GetUserData(url);
+            var channel = _connection.CreateModel();
+            _apiManager = new RabbitMqApiManager(url, user, password, channel);
 
-            return apiManager;
-        }
+            return _apiManager;
+        }        
 
         public IConsumer BuildConsumer()
         {
-            var channel = connection.CreateModel();
-            return new AmqpConsumer(channel, InternalBuildPublisher(channel), this, BuildAPIManager());
+            var channel = _connection.CreateModel();
+            return new AmqpConsumer(channel, InternalBuildPublisher(channel), this, BuildApiManager());
         }
 
         public IMessage BuildMessage(string queue, int version, string data = null)
         {
             if (!MessageQueueMap.ContainsKey(queue))
             {
-                throw new KeyNotFoundException($"Não existe nenhuma mensagem mapeada para a fila {queue}");
+                throw new KeyNotFoundException(string.Format(Resources.NoMessagesMappedToQueue, queue));
             }
             return BuildSerializer().Deserialize(MessageQueueMap[queue], data);
         }
 
         public IPublisher BuildPublisher()
         {
-            return InternalBuildPublisher(connection.CreateModel());
+            return InternalBuildPublisher(_connection.CreateModel());
         }
 
         public ISerializer BuildSerializer()
         {
-            return new JsonSerializer();
+            return new MessageSerializer();
         }
 
         private IPublisher InternalBuildPublisher(IModel channel)
         {
-            return new AmqpPublisher(channel, BuildSerializer(), BuildAPIManager());
+            return new AmqpPublisher(channel, BuildSerializer(), BuildApiManager());
+        }
+        
+        private static (string, string) GetUserData(string url)
+        {
+            var parser = new Uri(url);
+            var userInfo = parser.UserInfo.Split(':');
+            var user = userInfo.Length >= 1 && !string.IsNullOrEmpty(userInfo[0]) ? userInfo[0] : Guest;
+            var password = userInfo.Length >= 2 ? userInfo[1] : Guest;
+            return (user, password);
         }
 
         #region IDisposable Support
-        private bool disposedValue = false; // Para detectar chamadas redundantes
+        private bool disposedValue; // Para detectar chamadas redundantes
 
         protected virtual void Dispose(bool disposing)
         {
@@ -87,7 +95,7 @@ namespace Softplan.Common.Messaging.AMQP
             {
                 if (disposing)
                 {
-                    connection.Close();
+                    _connection.Close();
                 }
 
                 disposedValue = true;

@@ -1,28 +1,27 @@
 using Softplan.Common.Messaging.Abstractions;
 using Softplan.Common.Messaging.Extensions;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Softplan.Common.Messaging.Properties;
 
 namespace Softplan.Common.Messaging
 {
     public class MessagingManager : IMessagingManager, IDisposable
     {
-        private readonly ILogger logger;
-        private readonly IList<IConsumer> consumers;
-        private readonly ILoggerFactory loggerFactory;
-        private bool active = false;
+        private readonly ILogger _logger;
+        private readonly IList<IConsumer> _consumers;
+        private readonly ILoggerFactory _loggerFactory;
+        private bool _active;
 
         public IList<IProcessor> EnabledProcessors { get; set; }
         public IBuilder Builder { get; }
         public IProcessorIgnorer ProcessorIgnorer { get; set; }
         public bool Active
         {
-            get { return active; }
+            get => _active;
             set
             {
                 if (value)
@@ -38,180 +37,178 @@ namespace Softplan.Common.Messaging
 
         public MessagingManager(IBuilder builder, ILoggerFactory loggerFactory)
         {
-            this.Builder = builder;
-            this.loggerFactory = loggerFactory;
-
-            logger = loggerFactory.CreateLogger<MessagingManager>();
+            Builder = builder;
+            _loggerFactory = loggerFactory;
+            _logger = loggerFactory.CreateLogger<MessagingManager>();
             EnabledProcessors = new List<IProcessor>();
-            consumers = new List<IConsumer>();
-        }
-
-        public MessagingManager()
-        {
+            _consumers = new List<IConsumer>();
         }
 
         public void Start()
         {
-            if (active)
-            {
-                logger.LogInformation("MQManager already started.");
-                return;
-            }
+            if (IsActive()) return;
 
             try
             {
-                logger.LogInformation("Starting MQManager.");
-                active = true;
+                _logger.LogInformation(Resources.MQManagerStarting);
+                _active = true;
                 StartConsumers();
-                logger.LogInformation("MQManager started.");
+                _logger.LogInformation(Resources.MQManagerStarted);
             }
-            catch (Exception err)
+            catch (Exception ex)
             {
-                logger.LogError(err, "Error while starting MQManager");
+                _logger.LogError(ex, Resources.MQManagerErrorWhileStarting);
                 Stop();
             }
-        }
+        }        
+
         public void Stop()
         {
-            if (!active)
-            {
-                return;
-            }
+            if (IsInactive()) return;
 
-            logger.LogInformation("Stopping MQManager");
-            StopConsumers();
-            active = false;
-            logger.LogInformation("MQManager stopped");
-        }
+            try
+            {
+                _logger.LogInformation(Resources.MQManagerStopping);
+                StopConsumers();
+                _active = false;
+                _logger.LogInformation(Resources.MQManagerStopped);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, Resources.MQManagerErrorWhileStopping);
+            }
+        }        
 
         public void RegisterProcessor(IProcessor processor)
         {
             EnabledProcessors.Add(processor);
             Builder.MessageQueueMap[processor.GetQueueName()] = processor.GetMessageType();
-        }
+        }                               
 
-        private IList<object> GetConstructorDIArgs(ConstructorInfo ctor, IServiceProvider serviceProvider)
-        {
-            IList<object> args = new List<object>();
-
-            foreach (var arg in ctor.GetParameters())
-            {
-
-                var svc = serviceProvider.GetService(arg.ParameterType);
-                if (svc == null)
-                {
-                    if (!arg.HasDefaultValue)
-                    {
-                        return args;
-                    }
-
-                    svc = arg.DefaultValue;
-                }
-
-                args.Add(svc);
-            }
-
-            return args;
-        }
-
-        private IProcessor CreateProcessor(IServiceProvider serviceProvider, Type type)
-        {
-
-            foreach (var ctor in type.GetConstructors())
-            {
-                var args = GetConstructorDIArgs(ctor, serviceProvider);
-
-                if (args.Count != ctor.GetParameters().Count())
-                {
-                    continue;
-                }
-
-                return ctor.Invoke(args.ToArray()) as IProcessor;
-            }
-            return null;
-        }
-
-        private bool ShouldIgnoreProcessor(Type type)
-        {
-            if (EnabledProcessors.FirstOrDefault(p => p.GetType() == type) != null)
-            {
-                logger.LogDebug($"Processor {type} is already registered.");
-                return true;
-            }
-
-            if (type.IsAbstract || !type.IsClass || type.IsNotPublic)
-            {
-                logger.LogDebug($"Processor {type} is not a valid, public processor type.");
-                return true;
-            }
-
-            if (ProcessorIgnorer != null && ProcessorIgnorer.ShouldIgnoreProcessorFrom(type))
-            {
-                logger.LogDebug($"Processor of {type} was explicity ignored.");
-                return true;
-            }
-
-            return false;
-        }
         public void LoadProcessors(IServiceProvider serviceProvider)
         {
-            var types = AppDomain
-                .CurrentDomain
-                .GetAssemblies()
-                .SelectMany(assembly => assembly.ListImplementationsOf<IProcessor>());
-
+            var types = GetTypes();
             foreach (var type in types)
             {
-                if (ShouldIgnoreProcessor(type))
-                {
-                    continue;
-                }
-
+                if (ShouldIgnoreProcessor(type)) continue;                
                 var processor = CreateProcessor(serviceProvider, type);
-                if (processor == null)
-                {
-                    logger.LogWarning($"Could not create a instance of {type} processor.");
-                    continue;
-                }
-
+                if (ProcessorIsNull(processor, type)) continue;
                 RegisterProcessor(processor);
             }
+        }        
+
+        private bool IsActive()
+        {
+            if (!_active) return false;
+            _logger.LogInformation(Resources.MQManagerAlreadyStarted);
+            return true;
         }
 
         private void StartConsumers()
         {
             foreach (var processor in EnabledProcessors)
             {
-                processor.Logger = loggerFactory.CreateLogger(processor.GetType());
+                processor.Logger = _loggerFactory.CreateLogger(processor.GetType());
                 var consumer = Builder.BuildConsumer();
                 consumer.Start(processor, processor.GetQueueName());
-                consumers.Add(consumer);
+                _consumers.Add(consumer);
             }
         }
 
+        private bool IsInactive()
+        {
+            if (_active) return false;
+            _logger.LogInformation(Resources.MQManagerNotStarted);
+            return true;
+        }
+        
         private void StopConsumers()
         {
-            foreach (var consumer in consumers)
+            foreach (var consumer in _consumers)
             {
                 consumer.Stop();
             }
-            consumers.Clear();
+            _consumers.Clear();
+        } 
+        
+        private static IEnumerable<Type> GetTypes()
+        {
+            var types = AppDomain
+                .CurrentDomain
+                .GetAssemblies()
+                .SelectMany(assembly => assembly.ListImplementationsOf<IProcessor>());
+            return types;
         }
 
+        private bool ShouldIgnoreProcessor(Type type)
+        {
+            return ProcessorAlreadyRegistered(type) ||
+                   ShouldIgnoreProcessorByType(type) ||
+                   ProcessorExplicitlyIgnored(type);
+        }
+
+        private bool ProcessorAlreadyRegistered(Type type)
+        {
+            if (EnabledProcessors.FirstOrDefault(p => p.GetType() == type) == null) return false;
+            _logger.LogDebug(string.Format(Resources.ProcessorAlreadyResgistered, type));
+            return true;
+        }
+
+        private bool ShouldIgnoreProcessorByType(Type type)
+        {
+            if (!type.IsAbstract && type.IsClass && !type.IsNotPublic) return false;
+            _logger.LogDebug(string.Format(Resources.ProcessorIsInvalid, type));
+            return true;
+        }
+
+        private bool ProcessorExplicitlyIgnored(Type type)
+        {
+            if (ProcessorIgnorer == null || !ProcessorIgnorer.ShouldIgnoreProcessorFrom(type)) return false;
+            _logger.LogDebug(string.Format(Resources.ProcessorWasIgnored, type));
+            return true;
+        }
+        
+        private static IProcessor CreateProcessor(IServiceProvider serviceProvider, Type type)
+        {
+            return (from constructorInfo in type.GetConstructors()
+                let args = GetConstructorDiArgs(constructorInfo, serviceProvider)
+                where args.Count == constructorInfo.GetParameters().Count()
+                select constructorInfo.Invoke(args.ToArray()) as IProcessor).FirstOrDefault();
+        } 
+        
+        private static IList<object> GetConstructorDiArgs(MethodBase methodBase, IServiceProvider serviceProvider)
+        {
+            return methodBase.GetParameters().Select(arg => GetServiceValue(arg, serviceProvider))
+                                             .Where(svc => svc != null).ToList();
+        }
+        
+        private static object GetServiceValue(ParameterInfo arg, IServiceProvider serviceProvider)
+        {
+            var svc = serviceProvider.GetService(arg.ParameterType);
+            if (svc != null) return svc;
+            return arg.HasDefaultValue ? arg.DefaultValue : null;
+        }
+        
+        private bool ProcessorIsNull(IProcessor processor, Type type)
+        {
+            if (processor != null) return false;
+            _logger.LogWarning(string.Format(Resources.ProcessorInstanceCouldNotBeCreated, type));
+            return true;
+        }
+        
+
         #region IDisposable Support
-        private bool disposedValue = false; // Para detectar chamadas redundantes
+        private bool _disposedValue; // Para detectar chamadas redundantes
 
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposedValue)
+            if (_disposedValue) return;
+            if (disposing)
             {
-                if (disposing)
-                {
-                    StopConsumers();
-                }
-
-                disposedValue = true;
+                StopConsumers();
             }
+
+            _disposedValue = true;
         }
 
         // Não altere este código. Coloque o código de limpeza em Dispose(bool disposing) acima.

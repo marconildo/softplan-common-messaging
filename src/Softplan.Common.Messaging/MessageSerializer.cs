@@ -5,9 +5,9 @@ using Newtonsoft.Json;
 
 namespace Softplan.Common.Messaging
 {
-    public class JsonSerializer : ISerializer
+    public class MessageSerializer : ISerializer
     {
-        public T Deserialize<T>(string data)
+        public T Deserialize<T>(string data) where T : IMessage
         {
             return JsonConvert.DeserializeObject<T>(data);
         }

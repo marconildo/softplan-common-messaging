@@ -1,18 +1,12 @@
 using System;
-using Softplan.Common.Messaging;
-using Softplan.Common.Messaging.Abstractions;
 using Microsoft.Extensions.Logging;
+using Softplan.Common.Messaging.Abstractions;
 
-namespace Softplan.Common.Messaging.UnitTest.TestProcessors
+namespace Softplan.Common.Messaging.Tests.TestProcessors
 {
     public class TestProcessor : IProcessor
     {
         public ILogger Logger { get; set; }
-
-        public TestProcessor(bool valid = true)
-        {
-            //test for default args
-        }
 
         public Type GetMessageType()
         {
@@ -21,7 +15,7 @@ namespace Softplan.Common.Messaging.UnitTest.TestProcessors
 
         public string GetQueueName()
         {
-            return String.Empty;
+            return string.Empty;
         }
 
         public bool HandleProcessError(IMessage message, IPublisher publisher, Exception error)

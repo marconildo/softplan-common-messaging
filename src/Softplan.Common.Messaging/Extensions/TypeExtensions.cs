@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 
 namespace Softplan.Common.Messaging.Extensions
 {
@@ -7,7 +8,7 @@ namespace Softplan.Common.Messaging.Extensions
     {
         public static bool Implements<T>(this Type type)
         {
-            return (type as System.Reflection.TypeInfo).ImplementedInterfaces.Contains(typeof(T));
+            return ((TypeInfo) type).ImplementedInterfaces.Contains(typeof(T));
         }
     }
 }

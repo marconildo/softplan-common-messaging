@@ -9,7 +9,7 @@ namespace Softplan.Common.Messaging.Abstractions
 
         byte[] Serialize(IMessage message, Encoding encoding);
 
-        T Deserialize<T>(string data);
+        T Deserialize<T>(string data) where T : IMessage;
 
         IMessage Deserialize(Type messageType, string data);
     }

@@ -11,6 +11,5 @@ namespace Softplan.Common.Messaging.Messages
         public string Message { get; set; }
         public IMessage OriginalMessage { get; set; }
         public string OriginalQueue { get; set; }
-
     }
 }

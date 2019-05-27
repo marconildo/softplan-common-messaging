@@ -1,120 +1,227 @@
-using Softplan.Common.Messaging.AMQP;
-using Softplan.Common.Messaging.Infrastructure;
+using System;
+using System.Collections.Generic;
+using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Internal;
 using Moq;
 using RabbitMQ.Client;
-using RabbitMQ.Client.Exceptions;
-using System.Collections.Generic;
+using Softplan.Common.Messaging.AMQP;
+using Softplan.Common.Messaging.Infrastructure;
+using Softplan.Common.Messaging.Tests.Properties;
 using Xunit;
 
-namespace Softplan.Common.Messaging.UnitTest.AMQP
+namespace Softplan.Common.Messaging.Tests.AMQP
 {
     public class AmqpBuilderTests
     {
-        private readonly Mock<ILoggerFactory> loggerFactoryMock;
-        private readonly Mock<IConnectionFactory> connectionFactoryMock;
-        private readonly Mock<IConnection> connectionMock;
-        AmqpBuilder builder;
-
-        private IConfigurationSection GetMockConfigSection(string returnValue)
-        {
-            var res = new Mock<IConfigurationSection>();
-            res.SetupGet(r => r.Value).Returns(returnValue);
-            return res.Object;
-        }
+        private Mock<ILoggerFactory> _loggerFactoryMock;
+        private Mock<IConnectionFactory> _connectionFactoryMock;
+        private Mock<IConnection> _connectionMock;
+        private Mock<IConfiguration> _settingsMock;
+        private Mock<ILogger<AmqpBuilder>> _loggerMock;
+        private AmqpBuilder _builder;
+        
+        private const string RabbitUrlKey = "RABBIT_URL";
+        private const string RabbitUrlValue = "amqp://localhost";
+        private const string RabbitApiUrlKey = "RABBIT_API_URL";
+        private const string RabbitApiUrlValue = "http://user:password@localhost";
+        private const string LoggerName = "Softplan.Common.Messaging.AMQP.AmqpBuilder";
+        private const string TestQueueKey = "testQueue";
+        private const string TestUserValue = "testUser";
+        private const string UserData = "{\"userId\": \"testUser\"}";
+        private const string UnmappedQueueKey = "unmappedQueue";
+        
         public AmqpBuilderTests()
         {
-            loggerFactoryMock = new Mock<ILoggerFactory>();
-            loggerFactoryMock.Setup(l => l.CreateLogger(It.IsAny<string>()))
-                 .Returns(new Mock<ILogger<AmqpBuilder>>().Object);
-            connectionMock = new Mock<IConnection>();
-            connectionFactoryMock = new Mock<IConnectionFactory>();
+            const MockBehavior mockBehavior = MockBehavior.Strict;           
+            SetupLoggerMock(mockBehavior);
+            SetupLoggerFactoryMock(mockBehavior);
+            SetupConnectionMock(mockBehavior);
+            SetupConnectionFactoryMock(mockBehavior);
+            SetupSettingsMock(mockBehavior);
+        }        
 
-            connectionFactoryMock.Setup(c => c.CreateConnection())
-                .Returns(connectionMock.Object);
 
-            var settings = new Mock<IConfiguration>();
-            settings.Setup(s => s.GetSection("RABBIT_URL"))
-                .Returns(GetMockConfigSection("amqp://localhost"));
-            settings.Setup(s => s.GetSection("RABBIT_API_URL"))
-                .Returns(GetMockConfigSection("http://locahost"));
-            builder = new AmqpBuilder(settings.Object, loggerFactoryMock.Object, connectionFactoryMock.Object);
+        [Fact]
+        public void When_Create_Builder_Without_Logger_Factory_Should_Throw_Expected_exception()
+        {
+            Action action = () => new AmqpBuilder(_settingsMock.Object, null, _connectionFactoryMock.Object);
+            
+            action.Should()
+                .Throw<ArgumentNullException>()
+                .WithMessage(string.Format(Resources.ValueCannotBeNull, "factory"));
+        }
+        
+        [Fact]
+        public void When_Create_Builder_With_Logger_Factory_Should_Create_Logger()
+        {
+            _loggerFactoryMock.Invocations.Clear();
+            var amqpBuilder = new AmqpBuilder(_settingsMock.Object, _loggerFactoryMock.Object, _connectionFactoryMock.Object);
+
+            _loggerFactoryMock.Verify(l => l.CreateLogger(LoggerName), Times.Once);
+        }
+        
+        [Fact]
+        public void When_Create_Builder_Should_Create_Connection()
+        {
+            _connectionFactoryMock.Invocations.Clear();
+            var amqpBuilder = new AmqpBuilder(_settingsMock.Object, _loggerFactoryMock.Object, _connectionFactoryMock.Object);
+
+            _connectionFactoryMock.Verify(c => c.CreateConnection(), Times.Once);
+        }
+        
+        [Fact]
+        public void When_Create_Builder_Without_Connection_Factory_Should_Get_RabbitUrlKey_Configuration_Value()
+        {
+            _settingsMock.Invocations.Clear();
+            try
+            {
+                var amqpBuilder = new AmqpBuilder(_settingsMock.Object, _loggerFactoryMock.Object);
+            }
+            catch //Should throws exception because the new ConnectionFactory could not CreateConnection.
+            {
+                _settingsMock.Verify(s => s.GetSection(RabbitUrlKey), Times.Once);
+            }
+        }
+        
+        
+        [Fact]
+        public void When_BuildApiManager_Should_Return_Expected_Type()
+        {
+            var manager = _builder.BuildApiManager();
+            
+            manager.Should().BeOfType<RabbitMqApiManager>();                        
+        }
+        
+        [Fact]
+        public void When_BuildApiManager_Should_Log_Manager_Creation()
+        {
+            var manager = _builder.BuildApiManager();
+            
+            _loggerMock.Verify(l => l.Log(LogLevel.Trace, It.IsAny<EventId>(), new FormattedLogValues(Messaging.Properties.Resources.APIManagerCreating), It.IsAny<Exception>(), It.IsAny<Func<object, Exception, string>>()), Times.Once);
         }
 
         [Fact]
-        public void BuildApiManagerTest()
+        public void When_BuildApiManager_Should_Get_RabbitApiUrlKey_Configuration_Value()
         {
-            var manager = builder.BuildAPIManager();
-            var manager2 = builder.BuildAPIManager();
-            connectionMock.Setup(c => c.CreateModel()).Returns(new Mock<IModel>().Object);
-            Assert.Equal(manager, manager2);
-            connectionMock.Verify(c => c.CreateModel(), Times.Once());
-            connectionMock.VerifyNoOtherCalls();
+            var manager = _builder.BuildApiManager();
+            
+            _settingsMock.Verify(s => s.GetSection(RabbitApiUrlKey), Times.Once);
         }
+        
+        [Fact]
+        public void When_BuildApiManager_Should_Create_Model()
+        {
+            var manager = _builder.BuildApiManager();
+            
+            _connectionMock.Verify(c => c.CreateModel(), Times.Once);
+        }
+        
+        [Fact]
+        public void When_BuildApiManager_And_Manager_Already_Created_Should_Return_Same_Object()
+        {
+            var manager1 = _builder.BuildApiManager();
+            var manager2 = _builder.BuildApiManager();
+
+            manager1.Should().BeSameAs(manager2);
+        }                
+        
+        
+        [Fact]
+        public void When_BuildConsumer_Should_Return_Expected_Type()
+        {
+            var consumer = _builder.BuildConsumer();
+
+            consumer.Should().BeOfType<AmqpConsumer>();
+        }
+        
+        [Fact]
+        public void When_BuildConsumer_Should_Create_Model_As_Expected()
+        {
+            var consumer = _builder.BuildConsumer();
+
+            _connectionMock.Verify(c => c.CreateModel(), Times.Exactly(2));
+            _connectionMock.VerifyNoOtherCalls();
+        }
+        
+        
+        [Fact]
+        public void When_BuildMessage_Should_Return_Expected_Message()
+        {            
+            _builder.MessageQueueMap[TestQueueKey] = typeof(Message);
+            
+            var message = _builder.BuildMessage(TestQueueKey, 1, UserData);
+            Assert.IsType<Message>(message);
+            Assert.Equal(TestUserValue, message.UserId);
+        }
+        
+        [Fact]
+        public void When_Build_Unmapped_Message_Should_Throw_Expected_exception()
+        {            
+            Action action = () => _builder.BuildMessage(UnmappedQueueKey, 1);
+            
+            action.Should()
+                .Throw<KeyNotFoundException>()
+                .WithMessage(string.Format(Messaging.Properties.Resources.NoMessagesMappedToQueue, UnmappedQueueKey));
+        }
+        
 
         [Fact]
         public void BuildPublisherTest()
         {
-            connectionMock.Setup(c => c.CreateModel()).Returns(new Mock<IModel>().Object);
-            var publisher = builder.BuildPublisher();
+            _connectionMock.Setup(c => c.CreateModel()).Returns(new Mock<IModel>().Object);
+            var publisher = _builder.BuildPublisher();
 
-            connectionMock.Verify(c => c.CreateModel(), Times.Exactly(2));
-            connectionMock.VerifyNoOtherCalls();
+            _connectionMock.Verify(c => c.CreateModel(), Times.Exactly(2));
+            _connectionMock.VerifyNoOtherCalls();
             Assert.IsType<AmqpPublisher>(publisher);
+        }                
+        
+        
+        private void SetupLoggerMock(MockBehavior mockBehavior)
+        {
+            _loggerMock = new Mock<ILogger<AmqpBuilder>>(mockBehavior);
+            _loggerMock.Setup(l => l.Log(It.IsAny<LogLevel>(), It.IsAny<EventId>(), It.IsAny<FormattedLogValues>(),
+                It.IsAny<Exception>(), It.IsAny<Func<object, Exception, string>>()));
         }
 
-        [Fact]
-        public void CreateBuilderWithUserAndPasswordForApiTest()
+        private void SetupLoggerFactoryMock(MockBehavior mockBehavior)
         {
-            var settings = new Mock<IConfiguration>();
-            settings.Setup(s => s.GetSection("RABBIT_URL"))
-                .Returns(GetMockConfigSection("amqp://localhost"));
-            settings.Setup(s => s.GetSection("RABBIT_API_URL"))
-                .Returns(GetMockConfigSection("http://guest:guest@locahost"));
-
-            builder = new AmqpBuilder(settings.Object, loggerFactoryMock.Object, connectionFactoryMock.Object);
-            var manager = builder.BuildAPIManager();
-            Assert.IsType<RabbitMQApiManager>(manager);
+            _loggerFactoryMock = new Mock<ILoggerFactory>(mockBehavior);
+            _loggerFactoryMock.Setup(l => l.CreateLogger(It.IsAny<string>()))
+                .Returns(_loggerMock.Object);
         }
 
-        [Fact]
-        public void CreateBuilderWithoutConnectionFactoryTest()
+        private void SetupConnectionMock(MockBehavior mockBehavior)
         {
-            var settings = new Mock<IConfiguration>();
-            settings.Setup(s => s.GetSection("RABBIT_URL"))
-                .Returns(GetMockConfigSection("amqp://invalidhost"));
-            settings.Setup(s => s.GetSection("RABBIT_API_URL"))
-                .Returns(GetMockConfigSection("http://guest:guest@locahost"));
-
-            Assert.Throws<BrokerUnreachableException>(() => builder = new AmqpBuilder(settings.Object, loggerFactoryMock.Object, null));
+            var channelMock = new Mock<IModel>(mockBehavior);
+            _connectionMock = new Mock<IConnection>(mockBehavior);
+            _connectionMock.Setup(c => c.CreateModel()).Returns(channelMock.Object);
         }
 
-        [Fact]
-        public void BuildConsumerTest()
+        private void SetupConnectionFactoryMock(MockBehavior mockBehavior)
         {
-            connectionMock.Setup(c => c.CreateModel()).Returns(new Mock<IModel>().Object);
-            var consumer = builder.BuildConsumer();
-
-            connectionMock.Verify(c => c.CreateModel(), Times.Exactly(2));
-            connectionMock.VerifyNoOtherCalls();
-            Assert.IsType<AmqpConsumer>(consumer);
+            _connectionFactoryMock = new Mock<IConnectionFactory>(mockBehavior);
+            _connectionFactoryMock.Setup(c => c.CreateConnection())
+                .Returns(_connectionMock.Object);
         }
 
-        [Fact]
-        public void BuildMessageTest()
+        private void SetupSettingsMock(MockBehavior mockBehavior)
         {
-            builder.MessageQueueMap["testQueue"] = typeof(Message);
-            var message = builder.BuildMessage("testQueue", 1, "{\"userId\": \"testUser\"}");
-            Assert.IsType<Message>(message);
-            Assert.Equal("testUser", message.UserId);
+            _settingsMock = new Mock<IConfiguration>(mockBehavior);
+            _settingsMock.Setup(s => s.GetSection(RabbitUrlKey))
+                .Returns(GetMockConfigSection(RabbitUrlValue));
+            _settingsMock.Setup(s => s.GetSection(RabbitApiUrlKey))
+                .Returns(GetMockConfigSection(RabbitApiUrlValue));
+            _builder = new AmqpBuilder(_settingsMock.Object, _loggerFactoryMock.Object, _connectionFactoryMock.Object);
         }
-
-        [Fact]
-        public void BuildUnmappedMessage()
+        
+        private static IConfigurationSection GetMockConfigSection(string returnValue)
         {
-            var err = Assert.Throws<KeyNotFoundException>(() => builder.BuildMessage("unmappedQueue", 1));
-            Assert.Equal("Não existe nenhuma mensagem mapeada para a fila unmappedQueue", err.Message);
+            var res = new Mock<IConfigurationSection>();
+            res.SetupGet(r => r.Value).Returns(returnValue);
+            return res.Object;
         }
     }
 }

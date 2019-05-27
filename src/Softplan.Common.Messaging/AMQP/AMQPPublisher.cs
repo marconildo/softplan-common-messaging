@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Softplan.Common.Messaging.Abstractions;
-using Softplan.Common.Messaging.Infrastructure;
+using Softplan.Common.Messaging.Properties;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
@@ -12,85 +12,91 @@ namespace Softplan.Common.Messaging.AMQP
 {
     public class AmqpPublisher : IPublisher
     {
-        private readonly IModel channel;
-        private readonly ISerializer serializer;
-        private readonly IQueueApiManager manager;
+        private readonly IModel _channel;
+        private readonly ISerializer _serializer;
+        private readonly IQueueApiManager _manager;
+        
+        private const string SendToDefaultQueue = "x-send-to-default-queue";
+        private const string ContentEncoding = "utf-8";
+        
         public AmqpPublisher(IModel channel, ISerializer serializer, IQueueApiManager manager)
         {
-            this.channel = channel;
-            this.serializer = serializer;
-            this.manager = manager;
-        }
-
-        private IBasicProperties GetBasicMessageProperties(IMessage message)
-        {
-            var props = this.channel.CreateBasicProperties();
-            props.Persistent = true;
-            props.DeliveryMode = 2;
-            props.ContentEncoding = "utf-8";
-            // required by Delphi lib currently
-            props.Headers = props.Headers ?? new Dictionary<string, object>();
-            props.Headers["x-send-to-default-queue"] = "false";
-
-            if (!String.IsNullOrEmpty(message.ReplyTo))
-                props.ReplyTo = message.ReplyTo;
-
-            foreach (var h in message.Headers)
-                props.Headers[h.Key] = h.Value;
-
-            return props;
-        }
+            _channel = channel;
+            _serializer = serializer;
+            _manager = manager;
+        }        
 
         public void Publish(IMessage message, string destination = "", bool forceDestination = false)
         {
-            string _destination;
-            if (forceDestination)
-                _destination = destination;
-            else
-                _destination = String.IsNullOrEmpty(message.ReplyQueue) ? destination : message.ReplyQueue;
+            destination = GetDestination(message, destination, forceDestination);
+            _manager.EnsureQueue(destination);
+            var messageProperties = GetBasicMessageProperties(message);
+            var body = _serializer.Serialize(message, Encoding.UTF8);
+            _channel.BasicPublish(string.Empty, destination, false, messageProperties, body);
+        }        
 
-            if (String.IsNullOrEmpty(_destination))
-                throw new ArgumentException("Destination cannot be empty.");
-
-            this.manager.EnsureQueue(_destination);
-            this.channel.BasicPublish("", _destination, false, GetBasicMessageProperties(message), serializer.Serialize(message, Encoding.UTF8));
-        }
-
-        public Task<T> PublishAndWait<T>(IMessage message, string destination = "", bool forceDestination = false, int millisecodsTimeout = 60000) where T : IMessage
+        public Task<T> PublishAndWait<T>(IMessage message, string destination = "", bool forceDestination = false, int milliSecondsTimeout = 60000) where T : IMessage
         {
             return Task<T>.Factory.StartNew(() =>
             {
                 var respQueue = new BlockingCollection<T>();
-
-                var replyQueue = channel.QueueDeclare(String.Empty, false, true, true).QueueName;
+                var replyQueue = _channel.QueueDeclare(string.Empty).QueueName;
                 message.ReplyTo = replyQueue;
-                var consumerTag = channel.BasicConsume(replyQueue, true, CreateConsumer(respQueue));
-                try
-                {
-                    this.Publish(message, destination, forceDestination);
-
-                    if (!respQueue.TryTake(out T reply, millisecodsTimeout))
-                        throw new TimeoutException("A resposta da mensagem não foi recebida");
-
-                    return reply;
-                }
-                finally
-                {
-                    channel.BasicCancel(consumerTag);
-                }
+                var consumerTag = _channel.BasicConsume(replyQueue, true, CreateConsumer(respQueue));
+                return PublishAndWait(message, destination, forceDestination, milliSecondsTimeout, respQueue, consumerTag);
             });
+        }       
+
+
+        private static string GetDestination(IMessage message, string destination, bool forceDestination)
+        {
+            if (!forceDestination)
+                destination = string.IsNullOrEmpty(message.ReplyQueue) ? destination : message.ReplyQueue;
+            if (string.IsNullOrEmpty(destination))
+                throw new ArgumentException(Resources.MessageDestionationIsNull);            
+            return destination;
+        }
+        
+        private IBasicProperties GetBasicMessageProperties(IMessage message)
+        {
+            var props = _channel.CreateBasicProperties();
+            props.Persistent = true;
+            props.DeliveryMode = 2;            
+            props.ContentEncoding = ContentEncoding;
+            // required by Delphi lib currently
+            props.Headers = props.Headers ?? new Dictionary<string, object>();            
+            props.Headers[SendToDefaultQueue] = "false";
+            if (!string.IsNullOrEmpty(message.ReplyTo))
+                props.ReplyTo = message.ReplyTo;
+            foreach (var header in message.Headers)
+                props.Headers[header.Key] = header.Value;
+            return props;
         }
 
         private IBasicConsumer CreateConsumer<T>(BlockingCollection<T> respQueue) where T : IMessage
         {
-            var consumer = new EventingBasicConsumer(channel);
-            consumer.Received += (model, ea) =>
+            var consumer = new EventingBasicConsumer(_channel);
+            consumer.Received += (model, eventArgs) =>
             {
-                T message = serializer.Deserialize<T>(Encoding.UTF8.GetString(ea.Body));
+                var message = _serializer.Deserialize<T>(Encoding.UTF8.GetString(eventArgs.Body));
                 respQueue.Add(message);
             };
-
             return consumer;
+        }
+        
+        private T PublishAndWait<T>(IMessage message, string destination, bool forceDestination, int milliSecondsTimeout, BlockingCollection<T> respQueue, string consumerTag) where T : IMessage
+        {
+            try
+            {
+                Publish(message, destination, forceDestination);
+                if (respQueue.TryTake(out var reply, milliSecondsTimeout))
+                    return reply;
+                throw new TimeoutException(Resources.ReplyMessageNotReceived);
+            }
+            finally
+            {
+                _channel.BasicCancel(consumerTag);
+            }
         }
     }
 }
