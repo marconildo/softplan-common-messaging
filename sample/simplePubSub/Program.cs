@@ -13,7 +13,7 @@ namespace simplePubSub
     {
         private const string AppSettingsJson = "appsettings.json";
         private const string ItsWorking = "It's working";
-        private const string TestQueue123 = "testQueue123";
+        private const string Queue = "testQueue123";
         
         private static IConfiguration GetConfiguration()
         {            
@@ -40,7 +40,7 @@ namespace simplePubSub
                     manager.LoadProcessors(null);
                     manager.Start();
                     Console.WriteLine(Resources.PublicandoMensagem);                    
-                    publisher.Publish(new ExampleMessage() { Text = ItsWorking }, TestQueue123);
+                    publisher.Publish(new ExampleMessage() { Text = ItsWorking }, Queue);
                     Console.WriteLine(Resources.RodandoAplicacao);
                     Console.ReadLine();
                     manager.Stop();
