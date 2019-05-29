@@ -1,7 +1,7 @@
 using System;
 using System.Text;
 
-namespace Softplan.Common.Messaging.RabbitMq.Abstractions
+namespace Softplan.Common.Messaging.RabbitMq.Abstractions.Interfaces
 {
     public interface ISerializer
     {

@@ -7,7 +7,7 @@ using Moq;
 using RabbitMQ.Client;
 using Softplan.Common.Messaging.Extensions;
 using Softplan.Common.Messaging.RabbitMq;
-using Softplan.Common.Messaging.RabbitMq.Abstractions;
+using Softplan.Common.Messaging.RabbitMq.Abstractions.Interfaces;
 using Xunit;
 
 namespace Softplan.Common.Messaging.Tests.Extensions

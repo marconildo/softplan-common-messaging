@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Internal;
 using Moq;
 using Softplan.Common.Messaging.Properties;
-using Softplan.Common.Messaging.RabbitMq.Abstractions;
+using Softplan.Common.Messaging.RabbitMq.Abstractions.Interfaces;
 using Softplan.Common.Messaging.Tests.TestProcessors;
 using Xunit;
 

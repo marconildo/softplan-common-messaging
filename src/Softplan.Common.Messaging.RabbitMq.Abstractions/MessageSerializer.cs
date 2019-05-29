@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using Newtonsoft.Json;
+using Softplan.Common.Messaging.RabbitMq.Abstractions.Interfaces;
 
 namespace Softplan.Common.Messaging.RabbitMq.Abstractions
 {

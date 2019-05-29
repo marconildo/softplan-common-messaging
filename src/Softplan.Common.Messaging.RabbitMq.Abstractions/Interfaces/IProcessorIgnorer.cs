@@ -1,6 +1,6 @@
 using System;
 
-namespace Softplan.Common.Messaging.RabbitMq.Abstractions
+namespace Softplan.Common.Messaging.RabbitMq.Abstractions.Interfaces
 {
     public interface IProcessorIgnorer
     {

@@ -5,7 +5,7 @@ using Microsoft.Extensions.Configuration;
 using System.IO;
 using rpcExample.Properties;
 using Softplan.Common.Messaging.RabbitMq;
-using Softplan.Common.Messaging.RabbitMq.Abstractions;
+using Softplan.Common.Messaging.RabbitMq.Abstractions.Interfaces;
 
 namespace rpcExample
 {

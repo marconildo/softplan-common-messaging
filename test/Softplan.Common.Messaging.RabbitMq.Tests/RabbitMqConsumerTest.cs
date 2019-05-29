@@ -5,7 +5,7 @@ using FluentAssertions;
 using Moq;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using Softplan.Common.Messaging.RabbitMq.Abstractions;
+using Softplan.Common.Messaging.RabbitMq.Abstractions.Interfaces;
 using Softplan.Common.Messaging.RabbitMq.Properties;
 using Xunit;
 

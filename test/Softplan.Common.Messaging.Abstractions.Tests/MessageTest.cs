@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using FluentAssertions;
 using Newtonsoft.Json;
 using Softplan.Common.Messaging.RabbitMq.Abstractions;
+using Softplan.Common.Messaging.RabbitMq.Abstractions.Interfaces;
 using Xunit;
 
 namespace Softplan.Common.Messaging.Abstractions.Tests

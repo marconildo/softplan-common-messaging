@@ -1,6 +1,7 @@
 using System.Text;
 using FluentAssertions;
 using Softplan.Common.Messaging.RabbitMq.Abstractions;
+using Softplan.Common.Messaging.RabbitMq.Abstractions.Interfaces;
 using Xunit;
 
 namespace Softplan.Common.Messaging.Abstractions.Tests
