@@ -1,4 +1,3 @@
-using Softplan.Common.Messaging.Abstractions;
 using Softplan.Common.Messaging.Extensions;
 using Microsoft.Extensions.Logging;
 using System;
@@ -6,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Softplan.Common.Messaging.Properties;
+using Softplan.Common.Messaging.RabbitMq.Abstractions;
 
 namespace Softplan.Common.Messaging
 {

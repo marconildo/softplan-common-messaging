@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Softplan.Common.Messaging.Tests.Properties {
+namespace Softplan.Common.Messaging.RabbitMq.Tests.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Softplan.Common.Messaging.Tests.Properties {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Softplan.Common.Messaging.Tests.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Softplan.Common.Messaging.RabbitMq.Tests.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -57,6 +57,15 @@ namespace Softplan.Common.Messaging.Tests.Properties {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Value cannot be null.Parameter name: {0}.
+        /// </summary>
+        public static string ValueCanNotBeNull {
+            get {
+                return ResourceManager.GetString("ValueCanNotBeNull", resourceCulture);
             }
         }
     }

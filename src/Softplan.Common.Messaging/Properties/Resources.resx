@@ -54,25 +54,4 @@
     <data name="ProcessorWasIgnored" xml:space="preserve">
         <value>Processor of {0} was explicitly ignored.</value>
     </data>
-    <data name="RabbitMQAPIError" xml:space="preserve">
-        <value>Erro ao consultar API do RabbitMQ. Status {0} - {1}.</value>
-    </data>
-    <data name="ReplyMessageNotReceived" xml:space="preserve">
-        <value>A resposta da mensagem não foi recebida.</value>
-    </data>
-    <data name="MessageDestionationIsNull" xml:space="preserve">
-        <value>Destination cannot be empty.</value>
-    </data>
-    <data name="NomedaFilaNaoInformado" xml:space="preserve">
-        <value>Nome da fila não informado.</value>
-    </data>
-    <data name="ConsumerJainiciado" xml:space="preserve">
-        <value>"Consumer já iniciado."</value>
-    </data>
-    <data name="APIManagerCreating" xml:space="preserve">
-        <value>"Creating a new API Manager instance."</value>
-    </data>
-    <data name="NoMessagesMappedToQueue" xml:space="preserve">
-        <value>"Não existe nenhuma mensagem mapeada para a fila {0}."</value>
-    </data>
 </root>

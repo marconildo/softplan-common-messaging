@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Softplan.Common.Messaging.Abstractions;
 using rpcExample;
+using Softplan.Common.Messaging.RabbitMq.Abstractions;
 
 namespace webapi.Controllers
 {

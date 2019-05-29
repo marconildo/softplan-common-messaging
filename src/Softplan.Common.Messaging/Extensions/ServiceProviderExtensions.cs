@@ -1,6 +1,6 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
-using Softplan.Common.Messaging.Abstractions;
+using Softplan.Common.Messaging.RabbitMq.Abstractions;
 
 namespace Softplan.Common.Messaging.Extensions
 {

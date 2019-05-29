@@ -61,24 +61,6 @@ namespace Softplan.Common.Messaging.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &quot;Creating a new API Manager instance.&quot;.
-        /// </summary>
-        public static string APIManagerCreating {
-            get {
-                return ResourceManager.GetString("APIManagerCreating", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to &quot;Consumer já iniciado.&quot;.
-        /// </summary>
-        public static string ConsumerJainiciado {
-            get {
-                return ResourceManager.GetString("ConsumerJainiciado", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Destination cannot be empty..
         /// </summary>
         public static string MessageDestionationIsNull {
@@ -169,15 +151,6 @@ namespace Softplan.Common.Messaging.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &quot;Não existe nenhuma mensagem mapeada para a fila {0}.&quot;.
-        /// </summary>
-        public static string NoMessagesMappedToQueue {
-            get {
-                return ResourceManager.GetString("NoMessagesMappedToQueue", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Processor {0} is already registered..
         /// </summary>
         public static string ProcessorAlreadyResgistered {
@@ -210,15 +183,6 @@ namespace Softplan.Common.Messaging.Properties {
         public static string ProcessorWasIgnored {
             get {
                 return ResourceManager.GetString("ProcessorWasIgnored", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Erro ao consultar API do RabbitMQ. Status {0} - {1}..
-        /// </summary>
-        public static string RabbitMQAPIError {
-            get {
-                return ResourceManager.GetString("RabbitMQAPIError", resourceCulture);
             }
         }
         

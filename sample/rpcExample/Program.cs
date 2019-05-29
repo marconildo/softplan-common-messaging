@@ -1,11 +1,11 @@
 ﻿using System;
 using Softplan.Common.Messaging;
-using Softplan.Common.Messaging.Abstractions;
-using Softplan.Common.Messaging.AMQP;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using System.IO;
 using rpcExample.Properties;
+using Softplan.Common.Messaging.RabbitMq;
+using Softplan.Common.Messaging.RabbitMq.Abstractions;
 
 namespace rpcExample
 {
@@ -31,7 +31,7 @@ namespace rpcExample
             try
             {
                 ILoggerFactory factory = new LoggerFactory();
-                IBuilder builder = new AmqpBuilder(GetConfiguration(), factory);
+                IBuilder builder = new RabbitMqBuilder(GetConfiguration(), factory);
                 var publisher = builder.BuildPublisher();                
                 var manager = new MessagingManager(builder, factory);               
                 manager.LoadProcessors(null);

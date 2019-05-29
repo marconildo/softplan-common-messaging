@@ -1,11 +1,11 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
-using Softplan.Common.Messaging.Abstractions;
-using Softplan.Common.Messaging.AMQP;
 using System.IO;
 using rpcExample.Properties;
 using Softplan.Common.Messaging;
+using Softplan.Common.Messaging.RabbitMq;
+using Softplan.Common.Messaging.RabbitMq.Abstractions;
 
 namespace simplePubSub
 {
@@ -32,7 +32,7 @@ namespace simplePubSub
                 ILoggerFactory factory = new LoggerFactory();
                 var settings = GetConfiguration();
 
-                IBuilder builder = new AmqpBuilder(settings, factory);
+                IBuilder builder = new RabbitMqBuilder(settings, factory);
                 using (var manager = new MessagingManager(builder, factory))
                 {
                     var publisher = builder.BuildPublisher();
