@@ -16,7 +16,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\Softplan.Common.Messaging.RabbitMq.Abstractions\Softplan.Common.Messaging.RabbitMq.Abstractions.csproj" />
+      <ProjectReference Include="..\..\src\Softplan.Common.Messaging.Abstractions\Softplan.Common.Messaging.Abstractions.csproj" />
     </ItemGroup>
 
 </Project>

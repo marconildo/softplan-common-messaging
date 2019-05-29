@@ -55,7 +55,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Softplan.Common.Messaging.RabbitMq.Abstractions\Softplan.Common.Messaging.RabbitMq.Abstractions.csproj" />
+    <ProjectReference Include="..\Softplan.Common.Messaging.Abstractions\Softplan.Common.Messaging.Abstractions.csproj" />
     <ProjectReference Include="..\Softplan.Common.Messaging.RabbitMq\Softplan.Common.Messaging.RabbitMq.csproj" />
   </ItemGroup>
 </Project>

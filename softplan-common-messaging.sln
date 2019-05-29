@@ -23,7 +23,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Softplan.Common.Messaging.R
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Softplan.Common.Messaging.RabbitMq.Tests", "test\Softplan.Common.Messaging.RabbitMq.Tests\Softplan.Common.Messaging.RabbitMq.Tests.csproj", "{4D4F1887-ABCC-45C6-99A3-AE0499B38825}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Softplan.Common.Messaging.RabbitMq.Abstractions", "src\Softplan.Common.Messaging.RabbitMq.Abstractions\Softplan.Common.Messaging.RabbitMq.Abstractions.csproj", "{B8B985BB-135F-4C0A-AB64-BF6BD9A68595}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Softplan.Common.Messaging.Abstractions", "src\Softplan.Common.Messaging.Abstractions\Softplan.Common.Messaging.Abstractions.csproj", "{B8B985BB-135F-4C0A-AB64-BF6BD9A68595}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Softplan.Common.Messaging.Abstractions.Tests", "test\Softplan.Common.Messaging.Abstractions.Tests\Softplan.Common.Messaging.Abstractions.Tests.csproj", "{C6D7879A-982A-4E6E-97F8-FE83C0B4D03D}"
 EndProject

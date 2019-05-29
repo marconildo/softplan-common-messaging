@@ -19,7 +19,7 @@ namespace rpcExample
         {            
             var builder = new ConfigurationBuilder()
                            .SetBasePath(Directory.GetCurrentDirectory())
-                           .AddJsonFile(AppSettingsJson, optional: true, reloadOnChange: true)
+                           .AddJsonFile(AppSettingsJson, true, true)
                            .AddEnvironmentVariables();
 
             return builder.Build();

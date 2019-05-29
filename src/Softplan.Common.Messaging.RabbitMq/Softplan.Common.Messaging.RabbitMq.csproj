@@ -12,14 +12,14 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Softplan.Common.Messaging.RabbitMq.Abstractions\Softplan.Common.Messaging.RabbitMq.Abstractions.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
         <Compile Update="Properties\Resources.Designer.cs">
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
             <DependentUpon>Resources.resx</DependentUpon>
         </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Softplan.Common.Messaging.Abstractions\Softplan.Common.Messaging.Abstractions.csproj" />
     </ItemGroup>
 </Project>
