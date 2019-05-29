@@ -7,6 +7,7 @@ using Moq;
 using RabbitMQ.Client;
 using Softplan.Common.Messaging.Extensions;
 using Softplan.Common.Messaging.RabbitMq;
+using Softplan.Common.Messaging.RabbitMq.Abstractions;
 using Softplan.Common.Messaging.RabbitMq.Abstractions.Interfaces;
 using Xunit;
 
@@ -16,8 +17,6 @@ namespace Softplan.Common.Messaging.Tests.Extensions
     {
         private readonly IServiceCollection _services;
 
-        private const string RabbitApiSection = "RABBIT_API_URL";
-        private const string RabbitSection = "RABBIT_URL";
         private const string Url = "amqp://localhost";        
 
         public ServiceCollectionExtensionsTest()
@@ -29,8 +28,8 @@ namespace Softplan.Common.Messaging.Tests.Extensions
             var connectionFactoryMock = new Mock<IConnectionFactory>(mockBehavior);
             var connectionMock = new Mock<IConnection>(mockBehavior);            
             connectionFactoryMock.Setup(c => c.CreateConnection()).Returns(connectionMock.Object);            
-            configurationMock.Setup(c => c.GetSection(RabbitSection)).Returns(configurationSectionMock.Object);
-            configurationMock.Setup(c => c.GetSection(RabbitApiSection)).Returns(configurationSectionMock.Object);
+            configurationMock.Setup(c => c.GetSection(EnvironmentConstants.MessageBrokerUrl)).Returns(configurationSectionMock.Object);
+            configurationMock.Setup(c => c.GetSection(EnvironmentConstants.MessageBrokerApiUrl)).Returns(configurationSectionMock.Object);
             configurationSectionMock.Setup(c => c.Value).Returns(Url);
             loggerFactoryMock.Setup(l => l.CreateLogger(It.IsAny<string>())).Returns(new Mock<ILogger<RabbitMqBuilder>>().Object);
             connectionMock.Setup(c => c.CreateModel()).Returns(new Mock<IModel>().Object);

@@ -36,6 +36,7 @@
         <!-- Tags appear in the gallery and can be used for tag searches -->
         <tags>services rabbitmq messaging</tags>
         <Product>Softplan.Common.Messaging</Product>
+        <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

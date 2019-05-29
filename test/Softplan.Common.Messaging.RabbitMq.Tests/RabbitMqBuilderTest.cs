@@ -21,9 +21,7 @@ namespace Softplan.Common.Messaging.RabbitMq.Tests
         private Mock<ILogger<RabbitMqBuilder>> _loggerMock;
         private RabbitMqBuilder _builder;
         
-        private const string RabbitUrlKey = "RABBIT_URL";
         private const string RabbitUrlValue = "amqp://localhost";
-        private const string RabbitApiUrlKey = "RABBIT_API_URL";
         private const string RabbitApiUrlValue = "http://user:password@localhost";
         private const string LoggerName = "Softplan.Common.Messaging.RabbitMq.RabbitMqBuilder";
         private const string TestQueueKey = "testQueue";
@@ -80,7 +78,7 @@ namespace Softplan.Common.Messaging.RabbitMq.Tests
             }
             catch //Should throws exception because the new ConnectionFactory could not CreateConnection.
             {
-                _settingsMock.Verify(s => s.GetSection(RabbitUrlKey), Times.Once);
+                _settingsMock.Verify(s => s.GetSection(EnvironmentConstants.MessageBrokerUrl), Times.Once);
             }
         }
         
@@ -106,7 +104,7 @@ namespace Softplan.Common.Messaging.RabbitMq.Tests
         {
             var manager = _builder.BuildApiManager();
             
-            _settingsMock.Verify(s => s.GetSection(RabbitApiUrlKey), Times.Once);
+            _settingsMock.Verify(s => s.GetSection(EnvironmentConstants.MessageBrokerApiUrl), Times.Once);
         }
         
         [Fact]
@@ -209,9 +207,9 @@ namespace Softplan.Common.Messaging.RabbitMq.Tests
         private void SetupSettingsMock(MockBehavior mockBehavior)
         {
             _settingsMock = new Mock<IConfiguration>(mockBehavior);
-            _settingsMock.Setup(s => s.GetSection(RabbitUrlKey))
+            _settingsMock.Setup(s => s.GetSection(EnvironmentConstants.MessageBrokerUrl))
                 .Returns(GetMockConfigSection(RabbitUrlValue));
-            _settingsMock.Setup(s => s.GetSection(RabbitApiUrlKey))
+            _settingsMock.Setup(s => s.GetSection(EnvironmentConstants.MessageBrokerApiUrl))
                 .Returns(GetMockConfigSection(RabbitApiUrlValue));
             _builder = new RabbitMqBuilder(_settingsMock.Object, _loggerFactoryMock.Object, _connectionFactoryMock.Object);
         }

@@ -18,8 +18,6 @@ namespace Softplan.Common.Messaging.RabbitMq
 
         public IDictionary<string, Type> MessageQueueMap { get; }
         
-        private const string RabbitUrlKey = "RABBIT_URL";
-        private const string RabbitApiUrlKey = "RABBIT_API_URL";
         private const string Guest = "guest";
 
         public RabbitMqBuilder(IConfiguration appSettings, ILoggerFactory loggerFactory, IConnectionFactory connectionFactory = null)
@@ -28,7 +26,7 @@ namespace Softplan.Common.Messaging.RabbitMq
             _logger = loggerFactory.CreateLogger<RabbitMqBuilder>();
 
             MessageQueueMap = new Dictionary<string, Type>();
-            var factory = connectionFactory ?? new ConnectionFactory { Uri = new Uri(appSettings.GetValue<string>(RabbitUrlKey)) };
+            var factory = connectionFactory ?? new ConnectionFactory { Uri = new Uri(appSettings.GetValue<string>(EnvironmentConstants.MessageBrokerUrl)) };
 
             _connection = factory.CreateConnection();
         }
@@ -39,7 +37,7 @@ namespace Softplan.Common.Messaging.RabbitMq
                 return _apiManager;
 
             _logger.LogTrace(Resources.APIManagerCreating);
-            var url = _appSettings.GetValue<string>(RabbitApiUrlKey);            
+            var url = _appSettings.GetValue<string>(EnvironmentConstants.MessageBrokerApiUrl);            
             var (user, password) = GetUserData(url);
             var channel = _connection.CreateModel();
             _apiManager = new RabbitMqApiManager(url, user, password, channel);
