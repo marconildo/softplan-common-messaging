@@ -1,22 +1,20 @@
 using System;
-using System.Linq;
+using System.Configuration;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Softplan.Common.Messaging.Extensions;
+using Softplan.Common.Messaging.Properties;
 using Softplan.Common.Messaging.RabbitMq;
 using Softplan.Common.Messaging.RabbitMq.Abstractions;
-using Softplan.Common.Messaging.RabbitMq.Abstractions.Interfaces;
 using Xunit;
 
-namespace Softplan.Common.Messaging.Tests.Extensions
+namespace Softplan.Common.Messaging.Tests
 {
-    public class ServiceCollectionExtensionsTest
+    public class MessagingBuilderFactoryTest
     {
-        private readonly IServiceCollection _services;
-
+        private readonly MessagingBuilderFactory _messagingBuilderFactory;
+        
         private Mock<IConfigurationSection> _configurationMessageBrokerUrlSectionMock;
         private Mock<IConfigurationSection> _configurationMessageBrokerApiUrlSectionMock;
         private Mock<IConfigurationSection> _configurationMessageBrokerSectionMock;
@@ -25,42 +23,57 @@ namespace Softplan.Common.Messaging.Tests.Extensions
 
         private const string MessageBrokerUrl = "amqp://localhost";  
         private const string MessageBrokerApiUrl = "amqp://localhost";  
-        private const string MessageBroker = "RabbitMq";  
+        private const string MessageBroker = "RabbitMq";
 
-        public ServiceCollectionExtensionsTest()
+        public MessagingBuilderFactoryTest()
         {
-            const MockBehavior mockBehavior = MockBehavior.Strict;            
+            const MockBehavior mockBehavior = MockBehavior.Strict;
+            _messagingBuilderFactory = new MessagingBuilderFactory();            
             SetConfigurationMessageParameters(mockBehavior);
             SetConfigurationMock(mockBehavior);
             SetLoggerFactoryMock(mockBehavior);
-            _services = new ServiceCollection();
-        }        
+        }
 
-        [Theory]
-        [InlineData(typeof(IMessagingBuilderFactory))]
-        [InlineData(typeof(IBuilder))]
-        [InlineData(typeof(IPublisher))]
-        [InlineData(typeof(IMessagingManager))]
-        public void When_Call_AddMessagingManager_Should_Add_Expected_Services(Type type)
+        [Fact]
+        public void When_Has_Configuration_Should_Return_True()
         {
-            _services.AddMessagingManager(_configurationMock.Object, _loggerFactoryMock.Object);
-            
-            _services.Should().HaveCount(4);
-            var types = _services.Select(s => s.ServiceType).ToArray();
-            types.Should().Contain(type);
+            var result = _messagingBuilderFactory.HasConfiguration(_configurationMock.Object);
+
+            result.Should().BeTrue();
         }
         
         [Fact]
-        public void When_Call_AddMessagingManager_Without_Configuration_Should_Not_Add_Services()
+        public void When_Has_No_Configuration_Should_Return_False()
         {
-            _configurationMessageBrokerUrlSectionMock.Setup(c => c.Value).Returns(string.Empty);
-            _configurationMessageBrokerApiUrlSectionMock.Setup(c => c.Value).Returns(string.Empty);
-            _configurationMessageBrokerSectionMock.Setup(c => c.Value).Returns((string) null);            
-            
-            _services.AddMessagingManager(_configurationMock.Object, _loggerFactoryMock.Object);
-            
-            _services.Should().HaveCount(0);
+            SetInvalidConfiguration();
+
+            var result = _messagingBuilderFactory.HasConfiguration(_configurationMock.Object);
+
+            result.Should().BeFalse();
         }
+
+        
+        [Fact]
+        public void When_GetBuilder_Whith_No_Configuration_Should_Throws_The_Expected_Exception()
+        {
+            SetInvalidConfiguration();
+
+            Action ex = () => _messagingBuilderFactory.GetBuilder(_configurationMock.Object, _loggerFactoryMock.Object);
+            ex.Should().Throw<ConfigurationErrorsException>()
+                .WithMessage(Resources.AmqpConfigurationNotFound);
+        }
+
+        [Theory]
+        [InlineData("RabbitMq", typeof(RabbitMqBuilder))]
+        public void When_GetBuilder_Should_Return_Expected_According_Configuration(string messageBroker, Type expected)
+        {
+            _configurationMessageBrokerSectionMock.Setup(c => c.Value).Returns(messageBroker);
+            
+            var builder = _messagingBuilderFactory.GetBuilder(_configurationMock.Object, _loggerFactoryMock.Object);
+
+            builder.Should().BeOfType(expected);
+        }
+        
         
         private void SetConfigurationMessageParameters(MockBehavior mockBehavior)
         {
@@ -88,6 +101,13 @@ namespace Softplan.Common.Messaging.Tests.Extensions
             _loggerFactoryMock = new Mock<ILoggerFactory>(mockBehavior);
             _loggerFactoryMock.Setup(l => l.CreateLogger(It.IsAny<string>()))
                 .Returns(new Mock<ILogger<RabbitMqBuilder>>().Object);
+        }
+        
+        private void SetInvalidConfiguration()
+        {
+            _configurationMessageBrokerUrlSectionMock.Setup(c => c.Value).Returns(string.Empty);
+            _configurationMessageBrokerApiUrlSectionMock.Setup(c => c.Value).Returns(string.Empty);
+            _configurationMessageBrokerSectionMock.Setup(c => c.Value).Returns((string) null);
         }
     }
 }

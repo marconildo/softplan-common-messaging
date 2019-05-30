@@ -54,4 +54,10 @@
     <data name="ProcessorWasIgnored" xml:space="preserve">
         <value>Processor of {0} was explicitly ignored.</value>
     </data>
+    <data name="AmqpConfigurationNotFound" xml:space="preserve">
+        <value>Não foram encontradas configurações para AMQP.</value>
+    </data>
+    <data name="InvalidAmqpBroker" xml:space="preserve">
+        <value>O broker configurado é inválido.</value>
+    </data>
 </root>

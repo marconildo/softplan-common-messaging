@@ -25,12 +25,11 @@ namespace Softplan.Common.Messaging.Tests.Extensions
         [Fact]
         public void When_Broker_Is_Not_Configured_Should_Return_Undefined_Value()
         {
-            var config = new ConfigurationBuilder()
-                .Build();
+            var config = new ConfigurationBuilder().Build();
 
-            var provider = config.GetMessageBroker();
+            var broker = config.GetMessageBroker();
 
-            var result = Enum.IsDefined(typeof(MessageBrokers), provider);
+            var result = Enum.IsDefined(typeof(MessageBrokers), broker);
             result.Should().BeFalse();
         }
         
@@ -41,9 +40,8 @@ namespace Softplan.Common.Messaging.Tests.Extensions
             var config = SetConfig(someInvalidBroker);
 
             Action ex = () => config.GetMessageBroker();
-            ex.Should()
-                .Throw<InvalidOperationException>()
-                .WithMessage(string.Format(Resources.InvalidBrokerExceptionMessage, someInvalidBroker));
+            ex.Should().Throw<InvalidOperationException>()
+                       .WithMessage(string.Format(Resources.InvalidBrokerExceptionMessage, someInvalidBroker));
         }
         
         

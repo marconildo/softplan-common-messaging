@@ -37,13 +37,16 @@ namespace Softplan.Common.Messaging.RabbitMq.Tests
             SetupConnectionMock(mockBehavior);
             SetupConnectionFactoryMock(mockBehavior);
             SetupSettingsMock(mockBehavior);
-        }        
+        }                    
 
 
         [Fact]
         public void When_Create_Builder_Without_Logger_Factory_Should_Throw_Expected_exception()
         {
-            Action action = () => new RabbitMqBuilder(_settingsMock.Object, null, _connectionFactoryMock.Object);
+            Action action = () => new RabbitMqBuilder(_settingsMock.Object, null)
+            {
+                ConnectionFactory = _connectionFactoryMock.Object
+            };
             
             action.Should()
                 .Throw<ArgumentNullException>()
@@ -54,19 +57,13 @@ namespace Softplan.Common.Messaging.RabbitMq.Tests
         public void When_Create_Builder_With_Logger_Factory_Should_Create_Logger()
         {
             _loggerFactoryMock.Invocations.Clear();
-            var amqpBuilder = new RabbitMqBuilder(_settingsMock.Object, _loggerFactoryMock.Object, _connectionFactoryMock.Object);
+            var amqpBuilder = new RabbitMqBuilder(_settingsMock.Object, _loggerFactoryMock.Object)
+            {
+                ConnectionFactory = _connectionFactoryMock.Object
+            };
 
             _loggerFactoryMock.Verify(l => l.CreateLogger(LoggerName), Times.Once);
-        }
-        
-        [Fact]
-        public void When_Create_Builder_Should_Create_Connection()
-        {
-            _connectionFactoryMock.Invocations.Clear();
-            var amqpBuilder = new RabbitMqBuilder(_settingsMock.Object, _loggerFactoryMock.Object, _connectionFactoryMock.Object);
-
-            _connectionFactoryMock.Verify(c => c.CreateConnection(), Times.Once);
-        }
+        }                
         
         [Fact]
         public void When_Create_Builder_Without_Connection_Factory_Should_Get_RabbitUrlKey_Configuration_Value()
@@ -122,7 +119,16 @@ namespace Softplan.Common.Messaging.RabbitMq.Tests
             var manager2 = _builder.BuildApiManager();
 
             manager1.Should().BeSameAs(manager2);
-        }                
+        }   
+        
+        [Fact]
+        public void When_BuildApiManager_And_There_Is_No_Connection_Should_Create_Connection()
+        {
+            _connectionFactoryMock.Invocations.Clear();
+            var manager = _builder.BuildApiManager();
+
+            _connectionFactoryMock.Verify(c => c.CreateConnection(), Times.Once);
+        }
         
         
         [Fact]
@@ -140,6 +146,15 @@ namespace Softplan.Common.Messaging.RabbitMq.Tests
 
             _connectionMock.Verify(c => c.CreateModel(), Times.Exactly(2));
             _connectionMock.VerifyNoOtherCalls();
+        }
+        
+        [Fact]
+        public void When_BuildConsumer_And_There_Is_No_Connection_Should_Create_Connection()
+        {
+            _connectionFactoryMock.Invocations.Clear();
+            var consumer = _builder.BuildConsumer();
+
+            _connectionFactoryMock.Verify(c => c.CreateConnection(), Times.Once);
         }
         
         
@@ -165,15 +180,40 @@ namespace Softplan.Common.Messaging.RabbitMq.Tests
         
 
         [Fact]
-        public void BuildPublisherTest()
+        public void When_BuildPublisher_Should_Call_CreateModel_As_expected()
         {
-            _connectionMock.Setup(c => c.CreateModel()).Returns(new Mock<IModel>().Object);
+            _connectionMock.Invocations.Clear();
             var publisher = _builder.BuildPublisher();
 
             _connectionMock.Verify(c => c.CreateModel(), Times.Exactly(2));
             _connectionMock.VerifyNoOtherCalls();
-            Assert.IsType<RabbitMqPublisher>(publisher);
-        }                
+        }   
+        
+        [Fact]
+        public void When_BuildPublisher_Should_Return_Expected_Type()
+        {
+            var publisher = _builder.BuildPublisher();
+
+            publisher.Should().BeOfType<RabbitMqPublisher>();
+        } 
+        
+        [Fact]
+        public void When_BuildPublisher_And_There_Is_No_Connection_Should_Create_Connection()
+        {
+            _connectionFactoryMock.Invocations.Clear();
+            var publisher = _builder.BuildPublisher();
+
+            _connectionFactoryMock.Verify(c => c.CreateConnection(), Times.Once);
+        }
+        
+        
+        [Fact]
+        public void When_BuildSerializer_Should_Return_Expected_Type()
+        {
+            var serializer = _builder.BuildSerializer();
+
+            serializer.Should().BeOfType<MessageSerializer>();
+        }
         
         
         private void SetupLoggerMock(MockBehavior mockBehavior)
@@ -211,7 +251,10 @@ namespace Softplan.Common.Messaging.RabbitMq.Tests
                 .Returns(GetMockConfigSection(RabbitUrlValue));
             _settingsMock.Setup(s => s.GetSection(EnvironmentConstants.MessageBrokerApiUrl))
                 .Returns(GetMockConfigSection(RabbitApiUrlValue));
-            _builder = new RabbitMqBuilder(_settingsMock.Object, _loggerFactoryMock.Object, _connectionFactoryMock.Object);
+            _builder = new RabbitMqBuilder(_settingsMock.Object, _loggerFactoryMock.Object)
+            {
+                ConnectionFactory = _connectionFactoryMock.Object
+            };
         }
         
         private static IConfigurationSection GetMockConfigSection(string returnValue)

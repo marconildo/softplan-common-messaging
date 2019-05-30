@@ -61,11 +61,20 @@ namespace Softplan.Common.Messaging.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Destination cannot be empty..
+        ///   Looks up a localized string similar to Não foram encontradas configurações para AMQP..
         /// </summary>
-        public static string MessageDestionationIsNull {
+        public static string AmqpConfigurationNotFound {
             get {
-                return ResourceManager.GetString("MessageDestionationIsNull", resourceCulture);
+                return ResourceManager.GetString("AmqpConfigurationNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to O broker configurado é inválido..
+        /// </summary>
+        public static string InvalidAmqpBroker {
+            get {
+                return ResourceManager.GetString("InvalidAmqpBroker", resourceCulture);
             }
         }
         
@@ -142,15 +151,6 @@ namespace Softplan.Common.Messaging.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Nome da fila não informado..
-        /// </summary>
-        public static string NomedaFilaNaoInformado {
-            get {
-                return ResourceManager.GetString("NomedaFilaNaoInformado", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Processor {0} is already registered..
         /// </summary>
         public static string ProcessorAlreadyResgistered {
@@ -183,15 +183,6 @@ namespace Softplan.Common.Messaging.Properties {
         public static string ProcessorWasIgnored {
             get {
                 return ResourceManager.GetString("ProcessorWasIgnored", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to A resposta da mensagem não foi recebida..
-        /// </summary>
-        public static string ReplyMessageNotReceived {
-            get {
-                return ResourceManager.GetString("ReplyMessageNotReceived", resourceCulture);
             }
         }
     }
