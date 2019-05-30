@@ -175,7 +175,7 @@ namespace Softplan.Common.Messaging.RabbitMq.Tests
                 var message = GetMessage();
                 _publisher.PublishAndWait<Message>(message.Object, NewTestQueue, true, 10);
             }
-            catch (Exception e)
+            catch 
             {
                 _channelMock.Verify(c => c.BasicConsume(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(),It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<IDictionary<string, object>>(), It.IsAny<IBasicConsumer>()), Times.Once);
             }                        

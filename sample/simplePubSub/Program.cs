@@ -4,8 +4,6 @@ using Microsoft.Extensions.Configuration;
 using System.IO;
 using simplePubSub.Properties;
 using Softplan.Common.Messaging;
-using Softplan.Common.Messaging.RabbitMq;
-using Softplan.Common.Messaging.RabbitMq.Abstractions.Interfaces;
 
 namespace simplePubSub
 {
@@ -29,14 +27,13 @@ namespace simplePubSub
             Console.WriteLine(Resources.IniciandoAplicacao);
             try
             {
-                ILoggerFactory factory = new LoggerFactory();
+                var factory = new LoggerFactory();
                 var settings = GetConfiguration();
-
-                IBuilder builder = new RabbitMqBuilder(settings, factory);
+                var messagingBuilderFactory = new MessagingBuilderFactory();
+                var builder = messagingBuilderFactory.GetBuilder(settings, factory);
                 using (var manager = new MessagingManager(builder, factory))
                 {
                     var publisher = builder.BuildPublisher();
-
                     manager.LoadProcessors(null);
                     manager.Start();
                     Console.WriteLine(Resources.PublicandoMensagem);                    

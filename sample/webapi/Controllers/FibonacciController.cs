@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using rpcExample;
 using Softplan.Common.Messaging.RabbitMq.Abstractions.Interfaces;
@@ -23,16 +22,8 @@ namespace webapi.Controllers
         [HttpGet("{number}")]
         public async Task<ActionResult<int>> Get(int number)
         {
-            try
-            {
-                var response =
-                    await _publisher.PublishAndWait<FibMessage>(new FibMessage {Number = number}, TestFibonacci);
-                return Ok(response.Number);
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
+            var response = await _publisher.PublishAndWait<FibMessage>(new FibMessage {Number = number}, TestFibonacci);
+            return Ok(response.Number);
         }
     }
 }

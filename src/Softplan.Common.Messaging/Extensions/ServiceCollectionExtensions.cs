@@ -13,7 +13,7 @@ namespace Softplan.Common.Messaging.Extensions
             var builderFactory = new MessagingBuilderFactory();
             if (!builderFactory.HasConfiguration(config))
                 return services;
-            services.TryAddScoped<IMessagingBuilderFactory, MessagingBuilderFactory>();
+            services.TryAddSingleton<IMessagingBuilderFactory, MessagingBuilderFactory>();
             services.TryAddSingleton<IBuilder>(provider => provider.GetService<IMessagingBuilderFactory>().GetBuilder(config, loggerFactory));
             services.TryAddScoped<IPublisher>(provider => provider.GetService<IBuilder>().BuildPublisher());
             services.TryAddSingleton<IMessagingManager>(provider => new MessagingManager(provider.GetService<IBuilder>(), loggerFactory));

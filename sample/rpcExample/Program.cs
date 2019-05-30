@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using System.IO;
 using rpcExample.Properties;
-using Softplan.Common.Messaging.RabbitMq;
 using Softplan.Common.Messaging.RabbitMq.Abstractions.Interfaces;
 
 namespace rpcExample
@@ -30,8 +29,9 @@ namespace rpcExample
             Console.WriteLine(Resources.IniciandoAplicacao);
             try
             {
-                ILoggerFactory factory = new LoggerFactory();
-                IBuilder builder = new RabbitMqBuilder(GetConfiguration(), factory);
+                var factory = new LoggerFactory();
+                var messagingBuilderFactory = new MessagingBuilderFactory();
+                var builder = messagingBuilderFactory.GetBuilder(GetConfiguration(), factory);
                 var publisher = builder.BuildPublisher();                
                 var manager = new MessagingManager(builder, factory);               
                 manager.LoadProcessors(null);
