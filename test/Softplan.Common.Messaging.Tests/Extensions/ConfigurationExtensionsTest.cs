@@ -4,6 +4,7 @@ using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Softplan.Common.Messaging.Extensions;
 using Softplan.Common.Messaging.RabbitMq.Abstractions;
+using Softplan.Common.Messaging.RabbitMq.Abstractions.Constants;
 using Softplan.Common.Messaging.Tests.Properties;
 using Xunit;
 

@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Softplan.Common.Messaging.RabbitMq.Abstractions;
+using Softplan.Common.Messaging.RabbitMq.Abstractions.Constants;
 
 namespace Softplan.Common.Messaging.Extensions
 {

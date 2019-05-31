@@ -7,6 +7,7 @@ using Moq;
 using Softplan.Common.Messaging.Properties;
 using Softplan.Common.Messaging.RabbitMq;
 using Softplan.Common.Messaging.RabbitMq.Abstractions;
+using Softplan.Common.Messaging.RabbitMq.Abstractions.Constants;
 using Xunit;
 
 namespace Softplan.Common.Messaging.Tests
