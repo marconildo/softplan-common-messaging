@@ -61,29 +61,20 @@ namespace Softplan.Common.Messaging.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &quot;Creating a new API Manager instance.&quot;.
+        ///   Looks up a localized string similar to Não foram encontradas configurações para AMQP..
         /// </summary>
-        public static string APIManagerCreating {
+        public static string AmqpConfigurationNotFound {
             get {
-                return ResourceManager.GetString("APIManagerCreating", resourceCulture);
+                return ResourceManager.GetString("AmqpConfigurationNotFound", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &quot;Consumer já iniciado.&quot;.
+        ///   Looks up a localized string similar to O broker configurado é inválido..
         /// </summary>
-        public static string ConsumerJainiciado {
+        public static string InvalidAmqpBroker {
             get {
-                return ResourceManager.GetString("ConsumerJainiciado", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Destination cannot be empty..
-        /// </summary>
-        public static string MessageDestionationIsNull {
-            get {
-                return ResourceManager.GetString("MessageDestionationIsNull", resourceCulture);
+                return ResourceManager.GetString("InvalidAmqpBroker", resourceCulture);
             }
         }
         
@@ -160,24 +151,6 @@ namespace Softplan.Common.Messaging.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Nome da fila não informado..
-        /// </summary>
-        public static string NomedaFilaNaoInformado {
-            get {
-                return ResourceManager.GetString("NomedaFilaNaoInformado", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to &quot;Não existe nenhuma mensagem mapeada para a fila {0}.&quot;.
-        /// </summary>
-        public static string NoMessagesMappedToQueue {
-            get {
-                return ResourceManager.GetString("NoMessagesMappedToQueue", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Processor {0} is already registered..
         /// </summary>
         public static string ProcessorAlreadyResgistered {
@@ -210,24 +183,6 @@ namespace Softplan.Common.Messaging.Properties {
         public static string ProcessorWasIgnored {
             get {
                 return ResourceManager.GetString("ProcessorWasIgnored", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Erro ao consultar API do RabbitMQ. Status {0} - {1}..
-        /// </summary>
-        public static string RabbitMQAPIError {
-            get {
-                return ResourceManager.GetString("RabbitMQAPIError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to A resposta da mensagem não foi recebida..
-        /// </summary>
-        public static string ReplyMessageNotReceived {
-            get {
-                return ResourceManager.GetString("ReplyMessageNotReceived", resourceCulture);
             }
         }
     }

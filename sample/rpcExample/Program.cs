@@ -1,11 +1,10 @@
 ﻿using System;
 using Softplan.Common.Messaging;
-using Softplan.Common.Messaging.Abstractions;
-using Softplan.Common.Messaging.AMQP;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using System.IO;
 using rpcExample.Properties;
+using Softplan.Common.Messaging.RabbitMq.Abstractions.Interfaces;
 
 namespace rpcExample
 {
@@ -19,7 +18,7 @@ namespace rpcExample
         {            
             var builder = new ConfigurationBuilder()
                            .SetBasePath(Directory.GetCurrentDirectory())
-                           .AddJsonFile(AppSettingsJson, optional: true, reloadOnChange: true)
+                           .AddJsonFile(AppSettingsJson, true, true)
                            .AddEnvironmentVariables();
 
             return builder.Build();
@@ -30,8 +29,9 @@ namespace rpcExample
             Console.WriteLine(Resources.IniciandoAplicacao);
             try
             {
-                ILoggerFactory factory = new LoggerFactory();
-                IBuilder builder = new AmqpBuilder(GetConfiguration(), factory);
+                var factory = new LoggerFactory();
+                var messagingBuilderFactory = new MessagingBuilderFactory();
+                var builder = messagingBuilderFactory.GetBuilder(GetConfiguration(), factory);
                 var publisher = builder.BuildPublisher();                
                 var manager = new MessagingManager(builder, factory);               
                 manager.LoadProcessors(null);

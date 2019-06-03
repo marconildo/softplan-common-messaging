@@ -61,11 +61,11 @@ namespace Softplan.Common.Messaging.Tests.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Value cannot be null.Parameter name: {0}.
+        ///   Looks up a localized string similar to Failed to convert &apos;{0}&apos; to type &apos;Softplan.Common.Messaging.RabbitMq.Abstractions.MessageBrokers&apos;..
         /// </summary>
-        public static string ValueCannotBeNull {
+        public static string InvalidBrokerExceptionMessage {
             get {
-                return ResourceManager.GetString("ValueCannotBeNull", resourceCulture);
+                return ResourceManager.GetString("InvalidBrokerExceptionMessage", resourceCulture);
             }
         }
     }

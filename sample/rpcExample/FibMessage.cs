@@ -1,5 +1,5 @@
-using Softplan.Common.Messaging;
-using Softplan.Common.Messaging.Abstractions;
+using Softplan.Common.Messaging.RabbitMq.Abstractions;
+using Softplan.Common.Messaging.RabbitMq.Abstractions.Interfaces;
 
 namespace rpcExample
 {

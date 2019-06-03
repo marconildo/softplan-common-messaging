@@ -1,7 +1,7 @@
 using System;
 using Moq;
-using Softplan.Common.Messaging.Abstractions;
 using Softplan.Common.Messaging.Extensions;
+using Softplan.Common.Messaging.RabbitMq.Abstractions.Interfaces;
 using Xunit;
 
 namespace Softplan.Common.Messaging.Tests.Extensions
