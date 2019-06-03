@@ -5,8 +5,8 @@ using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
-using Softplan.Common.Messaging.RabbitMq.Abstractions;
-using Softplan.Common.Messaging.RabbitMq.Abstractions.Interfaces;
+using Softplan.Common.Messaging.Abstractions;
+using Softplan.Common.Messaging.Abstractions.Interfaces;
 using Softplan.Common.Messaging.RabbitMq.Properties;
 
 namespace Softplan.Common.Messaging.RabbitMq

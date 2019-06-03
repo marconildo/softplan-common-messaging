@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Softplan.Common.Messaging.RabbitMq.Abstractions.Interfaces
+namespace Softplan.Common.Messaging.Abstractions.Interfaces
 {
     public interface IMessagingManager
     {

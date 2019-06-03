@@ -5,9 +5,9 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Builder.Internal;
 using Microsoft.Extensions.Configuration;
 using Pose;
+using Softplan.Common.Messaging.Abstractions.Constants;
 using Softplan.Common.Messaging.ElasticApm.Constants;
 using Softplan.Common.Messaging.ElasticApm.Extensions;
-using Softplan.Common.Messaging.RabbitMq.Abstractions.Constants;
 using Softplan.Common.Messaging.Tests.Helper;
 using Xunit;
 

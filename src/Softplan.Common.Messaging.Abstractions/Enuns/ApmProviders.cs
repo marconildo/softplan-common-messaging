@@ -1,4 +1,4 @@
-namespace Softplan.Common.Messaging.RabbitMq.Abstractions.Enuns
+namespace Softplan.Common.Messaging.Abstractions.Enuns
 {
     public enum ApmProviders
     {

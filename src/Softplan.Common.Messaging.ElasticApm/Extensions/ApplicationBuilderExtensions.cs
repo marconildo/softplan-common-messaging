@@ -2,8 +2,8 @@ using System;
 using Elastic.Apm.All;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
+using Softplan.Common.Messaging.Abstractions.Constants;
 using Softplan.Common.Messaging.ElasticApm.Constants;
-using Softplan.Common.Messaging.RabbitMq.Abstractions.Constants;
 
 namespace Softplan.Common.Messaging.ElasticApm.Extensions
 {

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
-using Softplan.Common.Messaging.RabbitMq.Abstractions;
-using Softplan.Common.Messaging.RabbitMq.Abstractions.Constants;
-using Softplan.Common.Messaging.RabbitMq.Abstractions.Interfaces;
+using Softplan.Common.Messaging.Abstractions;
+using Softplan.Common.Messaging.Abstractions.Constants;
+using Softplan.Common.Messaging.Abstractions.Interfaces;
 using Softplan.Common.Messaging.RabbitMq.Properties;
 
 namespace Softplan.Common.Messaging.RabbitMq

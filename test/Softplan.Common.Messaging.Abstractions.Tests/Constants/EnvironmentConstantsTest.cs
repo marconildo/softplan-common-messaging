@@ -1,5 +1,5 @@
 using FluentAssertions;
-using Softplan.Common.Messaging.RabbitMq.Abstractions.Constants;
+using Softplan.Common.Messaging.Abstractions.Constants;
 using Xunit;
 
 namespace Softplan.Common.Messaging.Abstractions.Tests.Constants

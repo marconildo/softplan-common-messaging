@@ -6,8 +6,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Internal;
 using Moq;
 using RabbitMQ.Client;
-using Softplan.Common.Messaging.RabbitMq.Abstractions;
-using Softplan.Common.Messaging.RabbitMq.Abstractions.Constants;
+using Softplan.Common.Messaging.Abstractions;
+using Softplan.Common.Messaging.Abstractions.Constants;
 using Softplan.Common.Messaging.RabbitMq.Tests.Properties;
 using Xunit;
 

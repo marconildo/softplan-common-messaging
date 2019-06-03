@@ -5,11 +5,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Softplan.Common.Messaging.Abstractions.Constants;
+using Softplan.Common.Messaging.Abstractions.Interfaces;
 using Softplan.Common.Messaging.Extensions;
 using Softplan.Common.Messaging.RabbitMq;
-using Softplan.Common.Messaging.RabbitMq.Abstractions;
-using Softplan.Common.Messaging.RabbitMq.Abstractions.Constants;
-using Softplan.Common.Messaging.RabbitMq.Abstractions.Interfaces;
 using Xunit;
 
 namespace Softplan.Common.Messaging.Tests.Extensions

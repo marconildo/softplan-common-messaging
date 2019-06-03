@@ -1,7 +1,7 @@
 using System;
 using Microsoft.Extensions.Logging;
 using simplePubSub.Properties;
-using Softplan.Common.Messaging.RabbitMq.Abstractions.Interfaces;
+using Softplan.Common.Messaging.Abstractions.Interfaces;
 
 namespace simplePubSub
 {

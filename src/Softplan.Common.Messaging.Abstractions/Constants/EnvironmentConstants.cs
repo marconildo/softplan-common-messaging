@@ -1,4 +1,4 @@
-namespace Softplan.Common.Messaging.RabbitMq.Abstractions.Constants
+namespace Softplan.Common.Messaging.Abstractions.Constants
 {
     public static class EnvironmentConstants
     {

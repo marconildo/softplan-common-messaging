@@ -1,4 +1,4 @@
-namespace Softplan.Common.Messaging.RabbitMq.Abstractions
+namespace Softplan.Common.Messaging.Abstractions.Enuns
 {
     public enum MessageBrokers
     {

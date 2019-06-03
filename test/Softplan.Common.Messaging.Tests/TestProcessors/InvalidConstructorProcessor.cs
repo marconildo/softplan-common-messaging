@@ -1,6 +1,6 @@
 using System;
 using Microsoft.Extensions.Logging;
-using Softplan.Common.Messaging.RabbitMq.Abstractions.Interfaces;
+using Softplan.Common.Messaging.Abstractions.Interfaces;
 
 namespace Softplan.Common.Messaging.Tests.TestProcessors
 {

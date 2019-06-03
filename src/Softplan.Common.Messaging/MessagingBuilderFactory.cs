@@ -2,12 +2,12 @@ using System;
 using System.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Softplan.Common.Messaging.Abstractions.Constants;
+using Softplan.Common.Messaging.Abstractions.Enuns;
+using Softplan.Common.Messaging.Abstractions.Interfaces;
 using Softplan.Common.Messaging.Extensions;
 using Softplan.Common.Messaging.Properties;
 using Softplan.Common.Messaging.RabbitMq;
-using Softplan.Common.Messaging.RabbitMq.Abstractions;
-using Softplan.Common.Messaging.RabbitMq.Abstractions.Constants;
-using Softplan.Common.Messaging.RabbitMq.Abstractions.Interfaces;
 
 namespace Softplan.Common.Messaging
 {

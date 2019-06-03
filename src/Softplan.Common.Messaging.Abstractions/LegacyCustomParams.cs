@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace Softplan.Common.Messaging.RabbitMq.Abstractions
+namespace Softplan.Common.Messaging.Abstractions
 {
     public class LegacyCustomParams
     {
