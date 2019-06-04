@@ -97,7 +97,7 @@ namespace Softplan.Common.Messaging.Tests.Extensions
         {
             var dictionary = new Dictionary<string, string>
             {
-                {EnvironmentConstants.Provider, providerName}
+                {EnvironmentConstants.ApmProvider, providerName}
             };
             var config = new ConfigurationBuilder()
                 .AddInMemoryCollection(dictionary)

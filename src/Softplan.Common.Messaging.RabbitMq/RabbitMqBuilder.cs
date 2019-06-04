@@ -12,7 +12,8 @@ namespace Softplan.Common.Messaging.RabbitMq
 {
     public class RabbitMqBuilder : IBuilder, IDisposable
     {
-        private readonly IConfiguration _appSettings;
+        private readonly IConfiguration _config;
+        private readonly IMessageProcessorFactory _messageProcessorFactory;
         private readonly ILogger _logger;
         private IConnection _connection;
         private IQueueApiManager _apiManager;
@@ -34,9 +35,10 @@ namespace Softplan.Common.Messaging.RabbitMq
 
         private const string Guest = "guest";
 
-        public RabbitMqBuilder(IConfiguration appSettings, ILoggerFactory loggerFactory)
+        public RabbitMqBuilder(IConfiguration config, ILoggerFactory loggerFactory, IMessageProcessorFactory messageProcessorFactory)
         {
-            _appSettings = appSettings;
+            _config = config;
+            _messageProcessorFactory = messageProcessorFactory;
             _logger = loggerFactory.CreateLogger<RabbitMqBuilder>();
             MessageQueueMap = new Dictionary<string, Type>();
         }
@@ -47,7 +49,7 @@ namespace Softplan.Common.Messaging.RabbitMq
                 return _apiManager;
 
             _logger.LogTrace(Resources.APIManagerCreating);
-            var url = _appSettings.GetValue<string>(EnvironmentConstants.MessageBrokerApiUrl);            
+            var url = _config.GetValue<string>(EnvironmentConstants.MessageBrokerApiUrl);            
             var (user, password) = GetUserData(url);
             var channel = Connection.CreateModel();
             _apiManager = new RabbitMqApiManager(url, user, password, channel);
@@ -58,7 +60,7 @@ namespace Softplan.Common.Messaging.RabbitMq
         public IConsumer BuildConsumer()
         {
             var channel = Connection.CreateModel();
-            return new RabbitMqConsumer(channel, InternalBuildPublisher(channel), this, BuildApiManager());
+            return new RabbitMqConsumer(channel, InternalBuildPublisher(channel), this, BuildApiManager(), _messageProcessorFactory.GetMessageProcessor(_config));
         }
 
         public IMessage BuildMessage(string queue, int version, string data = null)
@@ -96,7 +98,7 @@ namespace Softplan.Common.Messaging.RabbitMq
         
         private ConnectionFactory GetConnectionFactory1()
         {
-            return new ConnectionFactory { Uri = new Uri(_appSettings.GetValue<string>(EnvironmentConstants.MessageBrokerUrl)) };
+            return new ConnectionFactory { Uri = new Uri(_config.GetValue<string>(EnvironmentConstants.MessageBrokerUrl)) };
         }
 
         #region IDisposable Support

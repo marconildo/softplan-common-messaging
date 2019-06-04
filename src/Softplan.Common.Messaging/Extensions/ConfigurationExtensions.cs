@@ -16,7 +16,7 @@ namespace Softplan.Common.Messaging.Extensions
         public static ApmProviders GetApmProvider(this IConfiguration configuration)
         {
             return configuration.GetValue<ApmProviders>(
-                EnvironmentConstants.Provider,
+                EnvironmentConstants.ApmProvider,
                 default);
         }
     }

@@ -79,6 +79,15 @@ namespace Softplan.Common.Messaging.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to O serviço de APM configurado é inválido..
+        /// </summary>
+        public static string InvalidApmProvider {
+            get {
+                return ResourceManager.GetString("InvalidApmProvider", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to MQManager already started..
         /// </summary>
         public static string MQManagerAlreadyStarted {

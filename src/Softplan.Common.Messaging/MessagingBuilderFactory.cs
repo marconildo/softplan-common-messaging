@@ -14,8 +14,14 @@ namespace Softplan.Common.Messaging
     public class MessagingBuilderFactory : IMessagingBuilderFactory
     {                
         private MessageBrokers _messageBroker;
+        private readonly IMessageProcessorFactory _messageProcessorFactory;
         private string _urlBroker;
         private string _urlApiBroker;
+
+        public MessagingBuilderFactory()
+        {
+            _messageProcessorFactory = new MessageProcessorFactory();
+        }
 
         public bool HasConfiguration(IConfiguration config)
         {
@@ -30,7 +36,7 @@ namespace Softplan.Common.Messaging
             switch (_messageBroker)
             {
                 case MessageBrokers.RabbitMq:
-                    return new RabbitMqBuilder(config, loggerFactory);
+                    return new RabbitMqBuilder(config, loggerFactory, _messageProcessorFactory);
                 default:
                     throw new ArgumentOutOfRangeException(Resources.InvalidAmqpBroker);
             }

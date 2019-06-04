@@ -60,4 +60,7 @@
     <data name="InvalidAmqpBroker" xml:space="preserve">
         <value>O broker configurado é inválido.</value>
     </data>
+    <data name="InvalidApmProvider" xml:space="preserve">
+        <value>O serviço de APM configurado é inválido.</value>
+    </data>
 </root>
