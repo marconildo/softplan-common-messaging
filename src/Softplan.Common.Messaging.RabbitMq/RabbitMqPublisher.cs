@@ -15,39 +15,39 @@ namespace Softplan.Common.Messaging.RabbitMq
         private readonly IModel _channel;
         private readonly ISerializer _serializer;
         private readonly IQueueApiManager _manager;
-        
+        private readonly IMessagePublisher _messagePublisher;
+
         private const string SendToDefaultQueue = "x-send-to-default-queue";
         private const string ContentEncoding = "utf-8";
         
-        public RabbitMqPublisher(IModel channel, ISerializer serializer, IQueueApiManager manager)
+        public RabbitMqPublisher(IModel channel, ISerializer serializer, IQueueApiManager manager, IMessagePublisher messagePublisher)
         {
             _channel = channel;
             _serializer = serializer;
             _manager = manager;
+            _messagePublisher = messagePublisher;
         }        
 
         public void Publish(IMessage message, string destination = "", bool forceDestination = false)
+        {
+            _messagePublisher.Publish(message, destination, forceDestination, PublishMessage);            
+        }        
+
+        public Task<T> PublishAndWait<T>(IMessage message, string destination = "", bool forceDestination = false, int milliSecondsTimeout = 60000) where T : IMessage
+        {
+            return _messagePublisher.PublishAndWait(message, destination, forceDestination, milliSecondsTimeout, PublishMessageAnPublishAndWait<T>);
+        }        
+
+
+        private void PublishMessage(IMessage message, string destination, bool forceDestination)
         {
             destination = GetDestination(message, destination, forceDestination);
             _manager.EnsureQueue(destination);
             var messageProperties = GetBasicMessageProperties(message);
             var body = _serializer.Serialize(message, Encoding.UTF8);
             _channel.BasicPublish(string.Empty, destination, false, messageProperties, body);
-        }        
-
-        public Task<T> PublishAndWait<T>(IMessage message, string destination = "", bool forceDestination = false, int milliSecondsTimeout = 60000) where T : IMessage
-        {
-            return Task<T>.Factory.StartNew(() =>
-            {
-                var respQueue = new BlockingCollection<T>();
-                var replyQueue = _channel.QueueDeclare(string.Empty).QueueName;
-                message.ReplyTo = replyQueue;
-                var consumerTag = _channel.BasicConsume(replyQueue, true, CreateConsumer(respQueue));
-                return PublishAndWait(message, destination, forceDestination, milliSecondsTimeout, respQueue, consumerTag);
-            });
-        }       
-
-
+        }
+        
         private static string GetDestination(IMessage message, string destination, bool forceDestination)
         {
             if (!forceDestination)
@@ -72,6 +72,18 @@ namespace Softplan.Common.Messaging.RabbitMq
                 props.Headers[header.Key] = header.Value;
             return props;
         }
+        
+        private Task<T> PublishMessageAnPublishAndWait<T>(IMessage message, string destination, bool forceDestination, int milliSecondsTimeout) where T : IMessage
+        {
+            return Task<T>.Factory.StartNew(() =>
+            {
+                var respQueue = new BlockingCollection<T>();
+                var replyQueue = _channel.QueueDeclare(string.Empty).QueueName;
+                message.ReplyTo = replyQueue;
+                var consumerTag = _channel.BasicConsume(replyQueue, true, CreateConsumer(respQueue));
+                return PublishAndWait(message, destination, forceDestination, milliSecondsTimeout, respQueue, consumerTag);
+            });
+        }
 
         private IBasicConsumer CreateConsumer<T>(BlockingCollection<T> respQueue) where T : IMessage
         {
@@ -82,13 +94,13 @@ namespace Softplan.Common.Messaging.RabbitMq
                 respQueue.Add(message);
             };
             return consumer;
-        }
+        }               
         
         private T PublishAndWait<T>(IMessage message, string destination, bool forceDestination, int milliSecondsTimeout, BlockingCollection<T> respQueue, string consumerTag) where T : IMessage
         {
             try
             {
-                Publish(message, destination, forceDestination);
+                PublishMessage(message, destination, forceDestination);
                 if (respQueue.TryTake(out var reply, milliSecondsTimeout))
                     return reply;
                 throw new TimeoutException(Resources.ReplyMessageNotReceived);

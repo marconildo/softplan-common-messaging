@@ -9,7 +9,7 @@ using Softplan.Common.Messaging.Properties;
 
 namespace Softplan.Common.Messaging
 {
-    public class MessageProcessorFactory : IMessageProcessorFactory
+    public class MessagingWorkersFactory : IMessagingWorkersFactory
     {
         private ApmProviders _apmProvider;
 
@@ -26,8 +26,21 @@ namespace Softplan.Common.Messaging
                     throw new ArgumentOutOfRangeException(Resources.InvalidApmProvider);
             }
         }
-        
-        
+
+        public IMessagePublisher GetMessagePublisher(IConfiguration config)
+        {
+            if (!HasConfiguration(config))
+                return new DefaultMessagePublisher();
+            switch (_apmProvider)
+            {
+                case ApmProviders.ElasticApm:
+                    return new ElasticApmMessagePublisher();
+                default:
+                    throw new ArgumentOutOfRangeException(Resources.InvalidApmProvider);
+            }
+        }
+
+
         private bool HasConfiguration(IConfiguration config)
         {
             _apmProvider = config.GetApmProvider();

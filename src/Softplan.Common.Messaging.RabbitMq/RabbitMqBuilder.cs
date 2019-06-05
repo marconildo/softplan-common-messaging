@@ -13,7 +13,7 @@ namespace Softplan.Common.Messaging.RabbitMq
     public class RabbitMqBuilder : IBuilder, IDisposable
     {
         private readonly IConfiguration _config;
-        private readonly IMessageProcessorFactory _messageProcessorFactory;
+        private readonly IMessagingWorkersFactory _messagingWorkersFactory;
         private readonly ILogger _logger;
         private IConnection _connection;
         private IQueueApiManager _apiManager;
@@ -35,10 +35,10 @@ namespace Softplan.Common.Messaging.RabbitMq
 
         private const string Guest = "guest";
 
-        public RabbitMqBuilder(IConfiguration config, ILoggerFactory loggerFactory, IMessageProcessorFactory messageProcessorFactory)
+        public RabbitMqBuilder(IConfiguration config, ILoggerFactory loggerFactory, IMessagingWorkersFactory messagingWorkersFactory)
         {
             _config = config;
-            _messageProcessorFactory = messageProcessorFactory;
+            _messagingWorkersFactory = messagingWorkersFactory;
             _logger = loggerFactory.CreateLogger<RabbitMqBuilder>();
             MessageQueueMap = new Dictionary<string, Type>();
         }
@@ -60,7 +60,7 @@ namespace Softplan.Common.Messaging.RabbitMq
         public IConsumer BuildConsumer()
         {
             var channel = Connection.CreateModel();
-            return new RabbitMqConsumer(channel, InternalBuildPublisher(channel), this, BuildApiManager(), _messageProcessorFactory.GetMessageProcessor(_config));
+            return new RabbitMqConsumer(channel, InternalBuildPublisher(channel), this, BuildApiManager(), _messagingWorkersFactory.GetMessageProcessor(_config));
         }
 
         public IMessage BuildMessage(string queue, int version, string data = null)
@@ -84,7 +84,7 @@ namespace Softplan.Common.Messaging.RabbitMq
 
         private IPublisher InternalBuildPublisher(IModel channel)
         {
-            return new RabbitMqPublisher(channel, BuildSerializer(), BuildApiManager());
+            return new RabbitMqPublisher(channel, BuildSerializer(), BuildApiManager(), _messagingWorkersFactory.GetMessagePublisher(_config));
         }
         
         private static (string, string) GetUserData(string url)

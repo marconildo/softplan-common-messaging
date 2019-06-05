@@ -9,18 +9,18 @@ using Xunit;
 
 namespace Softplan.Common.Messaging.Tests
 {
-    public class MessageProcessorFactoryTest
+    public class MessagingWorkersFactoryTest
     {
         private Mock<IConfigurationSection> _configurationApmProviderSectionMock;
         private Mock<IConfiguration> _configurationMock;
-        private MessageProcessorFactory _messageProcessorFactory;
+        private readonly MessagingWorkersFactory _messagingWorkersFactory;
         
         private const string ApmProvider = "ElasticApm";
         
-        public MessageProcessorFactoryTest()
+        public MessagingWorkersFactoryTest()
         {
             const MockBehavior mockBehavior = MockBehavior.Strict;
-            _messageProcessorFactory = new MessageProcessorFactory();            
+            _messagingWorkersFactory = new MessagingWorkersFactory();            
             SetConfigurationMessageParameters(mockBehavior);
             SetConfigurationMock(mockBehavior);
         }
@@ -31,7 +31,7 @@ namespace Softplan.Common.Messaging.Tests
         {
             _configurationApmProviderSectionMock.Setup(c => c.Value).Returns((string) null);
 
-            var builder = _messageProcessorFactory.GetMessageProcessor(_configurationMock.Object);
+            var builder = _messagingWorkersFactory.GetMessageProcessor(_configurationMock.Object);
 
             builder.Should().BeOfType<DefaultMessageProcessor>();
         }
@@ -42,7 +42,29 @@ namespace Softplan.Common.Messaging.Tests
         {
             _configurationApmProviderSectionMock.Setup(c => c.Value).Returns(messageBroker);
             
-            var builder = _messageProcessorFactory.GetMessageProcessor(_configurationMock.Object);
+            var builder = _messagingWorkersFactory.GetMessageProcessor(_configurationMock.Object);
+
+            builder.Should().BeOfType(expected);
+        }
+        
+        
+        [Fact]
+        public void When_GetMessagePublisher_Whith_No_Configuration_Should_Return_DefaultMessagePublisher()
+        {
+            _configurationApmProviderSectionMock.Setup(c => c.Value).Returns((string) null);
+
+            var builder = _messagingWorkersFactory.GetMessagePublisher(_configurationMock.Object);
+
+            builder.Should().BeOfType<DefaultMessagePublisher>();
+        }
+        
+        [Theory]
+        [InlineData("ElasticApm", typeof(ElasticApmMessagePublisher))]
+        public void When_GetMessagePublisher_Should_Return_Expected_According_Configuration(string messageBroker, Type expected)
+        {
+            _configurationApmProviderSectionMock.Setup(c => c.Value).Returns(messageBroker);
+            
+            var builder = _messagingWorkersFactory.GetMessagePublisher(_configurationMock.Object);
 
             builder.Should().BeOfType(expected);
         }
