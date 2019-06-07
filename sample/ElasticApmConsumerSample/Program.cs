@@ -57,12 +57,10 @@ namespace ElasticApmConsumerSample
         }
         
         /// <summary>
-        /// Faz a configuração do agente para utilização em ConcoleApplications.
-        ///
         /// Obs.:
-        /// A configuração do agente deve ser feita na aplicação, de acordo com a documentação disponível em https://www.elastic.co/guide/en/apm/agent/dotnet/current/index.html.
-        /// O componente de mensageria suporta o controle distribuido de transações, porém não é responsável por fazer a configuração do agente.
-        /// </summary>        
+        /// The configuration of the agent must be done in the application, according to the available documentation: https://www.elastic.co/guide/en/apm/agent/dotnet/current/index.html.
+        /// The messaging component supports distributed transaction control, but is not responsible for doing the agent configuration.
+        /// </summary>       
         private static void SetApmAgentConfiguration(IConfiguration config)
         {
             var apmProvider = config.GetApmProvider();

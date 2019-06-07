@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using Elastic.Apm;
 using Elastic.Apm.Config;
 using ElasticApmPublisherSample.Properties;
@@ -8,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Softplan.Common.Messaging;
 using Softplan.Common.Messaging.Abstractions.Enuns;
 using Softplan.Common.Messaging.Abstractions.Interfaces;
+using Softplan.Common.Messaging.ElasticApm.Constants;
 using Softplan.Common.Messaging.Extensions;
 
 namespace ElasticApmPublisherSample
@@ -47,11 +50,9 @@ namespace ElasticApmPublisherSample
         }
         
         /// <summary>
-        /// Faz a configuração do agente para utilização em ConcoleApplications.
-        ///
         /// Obs.:
-        /// A configuração do agente deve ser feita na aplicação, de acordo com a documentação disponível em https://www.elastic.co/guide/en/apm/agent/dotnet/current/index.html.
-        /// O componente de mensageria suporta o controle distribuido de transações, porém não é responsável por fazer a configuração do agente.
+        /// The configuration of the agent must be done in the application, according to the available documentation: https://www.elastic.co/guide/en/apm/agent/dotnet/current/index.html.
+        /// The messaging component supports distributed transaction control, but is not responsible for doing the agent configuration.
         /// </summary>        
         private static void SetApmAgentConfiguration(IConfiguration config)
         {
@@ -82,6 +83,15 @@ namespace ElasticApmPublisherSample
             if (action.Equals("2"))
                 PublishMessageAndWaitResponse(config);
         }
+        
+        private static IPublisher GetPublisher(IConfiguration config)
+        {
+            var loggerFactory = new LoggerFactory();
+            var messagingBuilderFactory = new MessagingBuilderFactory();
+            var builder = messagingBuilderFactory.GetBuilder(config, loggerFactory);
+            var publisher = builder.BuildPublisher();
+            return publisher;
+        }
 
         private static void PublishMessage(IConfiguration config)
         {                                          
@@ -90,11 +100,24 @@ namespace ElasticApmPublisherSample
             do
             {
                 Console.WriteLine(Resources.PublishingMessage);
-                publisher.Publish(new SimpleMessage {Text = Text}, SimpleMessageDestination);
+                var method = new StackFrame().GetMethod();
+                var message = GetSimpleMessage(method);
+                publisher.Publish(message, SimpleMessageDestination);
                 Console.WriteLine(Resources.ClosingApplication);
                 quit = Console.ReadLine();
             } while (!string.Equals(quit, "c", StringComparison.OrdinalIgnoreCase));
-        }        
+        }
+
+        private static SimpleMessage GetSimpleMessage(MemberInfo method)
+        {            
+            var name = $"{method.DeclaringType}.{method.Name}";
+            var message = new SimpleMessage
+            {
+                Text = Text,
+                Headers = {[ElasticApmConstants.TransactionName] = name} //Is recommended set the transaction name to be easy localize data.
+            };
+            return message;
+        }
 
         private static void PublishMessageAndWaitResponse(IConfiguration config)
         {                                         
@@ -107,7 +130,9 @@ namespace ElasticApmPublisherSample
                 if (string.Equals(value, "c", StringComparison.OrdinalIgnoreCase)) break;
                 if (!GetValue(value, out var fibNum)) continue;  
                 Console.WriteLine(Resources.PublishingMessage); 
-                var reply = publisher.PublishAndWait<FibMessage>(new FibMessage {Number = fibNum}, FibonacciDestination).Result;
+                var method = new StackFrame().GetMethod();
+                var message = GetFibMessage(method, fibNum);
+                var reply = publisher.PublishAndWait<FibMessage>(message, FibonacciDestination).Result;
                 Console.WriteLine(Resources.ResponseReceived); 
                 Console.WriteLine(string.IsNullOrEmpty(reply.ErrorMessage)
                     ? string.Format(Resources.FibonacciResult, fibNum, reply.Number)
@@ -115,22 +140,24 @@ namespace ElasticApmPublisherSample
                 Console.WriteLine(Resources.ClosingApplication);
                 quit = Console.ReadLine();
             } while (!string.Equals(quit, "c", StringComparison.OrdinalIgnoreCase));
-        }        
-
-        private static IPublisher GetPublisher(IConfiguration config)
-        {
-            var loggerFactory = new LoggerFactory();
-            var messagingBuilderFactory = new MessagingBuilderFactory();
-            var builder = messagingBuilderFactory.GetBuilder(config, loggerFactory);
-            var publisher = builder.BuildPublisher();
-            return publisher;
-        }
+        }                
         
         private static bool GetValue(string value, out int fibNum)
         {            
             if (int.TryParse(value, out fibNum)) return true;
             Console.WriteLine(Resources.InvalidIntValue, value);
             return false;
+        }
+        
+        private static FibMessage GetFibMessage(MemberInfo method, int fibNum)
+        {            
+            var name = $"{method.DeclaringType}.{method.Name}";
+            var message = new FibMessage
+            {
+                Number = fibNum,
+                Headers = {[ElasticApmConstants.TransactionName] = name} //Is recommended set the transaction name to be easy localize data.
+            };
+            return message;
         }
     }
 }

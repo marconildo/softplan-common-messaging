@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Reflection;
 using System.Threading.Tasks;
 using Elastic.Apm;
@@ -15,7 +16,8 @@ namespace Softplan.Common.Messaging.ElasticApm
         
         public void Publish(IMessage message, string destination, bool forceDestination, Action<IMessage, string, bool> publish)
         {
-            var name = $"{GetType().Name}.{MethodBase.GetCurrentMethod().Name}.{message.ReplyQueue}";
+            var method = new StackFrame().GetMethod();
+            var name = GetName(message, method, publish.GetMethodInfo().Name);
             var transaction = Agent.Tracer.CurrentTransaction;                        
             if (transaction != null)
             {
@@ -31,7 +33,8 @@ namespace Softplan.Common.Messaging.ElasticApm
         public async Task<T> PublishAndWait<T>(IMessage message, string destination, bool forceDestination, int milliSecondsTimeout,
             Func<IMessage, string, bool, int, Task<T>> publishAndWait) where T : IMessage
         {
-            var name = $"{GetType().Name}.{MethodBase.GetCurrentMethod().Name}.{message.ReplyQueue}";
+            var method = new StackFrame().GetMethod();
+            var name = GetName(message, method, publishAndWait.GetMethodInfo().Name);
             var transaction = Agent.Tracer.CurrentTransaction;             
             if (transaction != null)
             {
@@ -41,6 +44,14 @@ namespace Softplan.Common.Messaging.ElasticApm
                 async () => await PublishAndWait(message, destination, forceDestination, milliSecondsTimeout, publishAndWait));
         }
         
+        
+        private static string GetName(IMessage message, MemberInfo method, string actionName)
+        {            
+            var name = message.Headers.ContainsKey(ElasticApmConstants.TransactionName)
+                ? message.Headers[ElasticApmConstants.TransactionName].ToString()
+                : $"{method.DeclaringType}.{method.Name}.{actionName}";
+            return name;
+        }        
 
         private static void PublishMessage(IMessage message, string destination, bool forceDestination, Action<IMessage, string, bool> publish,
             IExecutionSegment transaction, string name)
