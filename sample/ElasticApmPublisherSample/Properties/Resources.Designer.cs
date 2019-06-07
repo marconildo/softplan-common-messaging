@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ElasticApmsample.Properties {
+namespace ElasticApmPublisherSample.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace ElasticApmsample.Properties {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ElasticApmSample.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ElasticApmPublisherSample.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,7 +61,16 @@ namespace ElasticApmsample.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The application was closed..
+        ///   Looks up a localized string similar to Press &apos;1&apos; to send a message or &apos;2&apos; to send a message and wait response..
+        /// </summary>
+        public static string ActionType {
+            get {
+                return ResourceManager.GetString("ActionType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Application closed..
         /// </summary>
         public static string ApplicationClosed {
             get {
@@ -79,11 +88,38 @@ namespace ElasticApmsample.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Press Enter to close application..
+        ///   Looks up a localized string similar to Press &apos;c&apos; to close or any key to send other message..
         /// </summary>
         public static string ClosingApplication {
             get {
                 return ResourceManager.GetString("ClosingApplication", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error to calc fibonacci to {0}..
+        /// </summary>
+        public static string FibonacciError {
+            get {
+                return ResourceManager.GetString("FibonacciError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fibonacci to {0} is {1}..
+        /// </summary>
+        public static string FibonacciResult {
+            get {
+                return ResourceManager.GetString("FibonacciResult", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} is not a valid integer..
+        /// </summary>
+        public static string InvalidIntValue {
+            get {
+                return ResourceManager.GetString("InvalidIntValue", resourceCulture);
             }
         }
         
@@ -115,6 +151,15 @@ namespace ElasticApmsample.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Response received..
+        /// </summary>
+        public static string ResponseReceived {
+            get {
+                return ResourceManager.GetString("ResponseReceived", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Setting Apm agent configuration..
         /// </summary>
         public static string SettingApmAgentConfiguration {
@@ -129,6 +174,15 @@ namespace ElasticApmsample.Properties {
         public static string StartingApplication {
             get {
                 return ResourceManager.GetString("StartingApplication", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Press &apos;c&apos; to close application or any number to calc Fibonacci..
+        /// </summary>
+        public static string WaitingFibonacciNumber {
+            get {
+                return ResourceManager.GetString("WaitingFibonacciNumber", resourceCulture);
             }
         }
     }

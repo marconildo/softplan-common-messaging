@@ -1,5 +1,6 @@
 using System;
 using Microsoft.Extensions.Logging;
+using rpcExample.Properties;
 using Softplan.Common.Messaging.Abstractions.Interfaces;
 
 namespace rpcExample
@@ -18,7 +19,7 @@ namespace rpcExample
         {
             var number = ((FibMessage)message).Number;
             if (number < 0)
-                throw new ArgumentOutOfRangeException("Fibpnacci requer que o número seja maior que zero.");
+                throw new ArgumentOutOfRangeException(Resources.NumeroMenorQueZero);
 
             publisher.Publish(new FibMessage(message) { Number = CalculateFib(number) });
         }

@@ -42,4 +42,7 @@
     <data name="ErroCalcularFibonacci" xml:space="preserve">
         <value>Erro ao calcular fibonacci: {0}</value>
     </data>
+    <data name="NumeroMenorQueZero" xml:space="preserve">
+        <value>Fibpnacci requer que o número seja maior que zero.</value>
+    </data>
 </root>

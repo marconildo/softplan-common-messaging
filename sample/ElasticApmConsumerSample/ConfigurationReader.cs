@@ -4,7 +4,7 @@ using Elastic.Apm.Config;
 using Elastic.Apm.Logging;
 using Microsoft.Extensions.Configuration;
 
-namespace ElasticApmsample
+namespace ElasticApmConsumerSample
 {
     public class ConfigurationReader: AbstractConfigurationReader, IConfigurationReader
     {

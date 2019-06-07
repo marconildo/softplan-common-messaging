@@ -1,20 +1,20 @@
 using System;
 using System.Threading;
-using ElasticApmsample.Properties;
+using ElasticApmConsumerSample.Properties;
 using Microsoft.Extensions.Logging;
 using Softplan.Common.Messaging.Abstractions.Interfaces;
 
-namespace ElasticApmsample
+namespace ElasticApmConsumerSample
 {
-    public class SampleProcessor : IProcessor
+    public class SimpleMessageProcessor : IProcessor
     {
-        private const string QueueName = "ElasticApmQueue";
+        private const string QueueName = "SimpleMessageDestination";
         
         public ILogger Logger { get; set; }
 
         public Type GetMessageType()
         {
-            return typeof(SampleMessage);
+            return typeof(SimpleMessage);
         }
 
         public string GetQueueName()
@@ -24,8 +24,9 @@ namespace ElasticApmsample
 
         public void ProcessMessage(IMessage message, IPublisher publisher)
         {
-            Thread.Sleep(10000);
-            Console.WriteLine(Resources.MessageSuccessfullyProcessed, ((SampleMessage)message).Text);
+            var randon = new Random();
+            Thread.Sleep(randon.Next(500,1500));
+            Console.WriteLine(Resources.MessageSuccessfullyProcessed, ((SimpleMessage)message).Text);
         }
 
         public bool HandleProcessError(IMessage message, IPublisher publisher, Exception error)

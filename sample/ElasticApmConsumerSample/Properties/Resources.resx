@@ -31,15 +31,18 @@
         <value>Publishing message.</value>
     </data>
     <data name="MessageSuccessfullyProcessed" xml:space="preserve">
-        <value>Message successfully processed.</value>
+        <value>Message successfully processed: {0}.</value>
     </data>
     <data name="MessageHandlingError" xml:space="preserve">
-        <value>Error while processing message.</value>
+        <value>Error while processing message: {0}.</value>
     </data>
     <data name="ClosingApplication" xml:space="preserve">
         <value>Press Enter to close application.</value>
     </data>
     <data name="ApplicationClosed" xml:space="preserve">
-        <value>The application was closed.</value>
+        <value>Application closed.</value>
+    </data>
+    <data name="InvalidFibValue" xml:space="preserve">
+        <value>The number should be greater than 0.</value>
     </data>
 </root>

@@ -32,13 +32,11 @@ namespace Softplan.Common.Messaging.ElasticApm
             Func<IMessage, string, bool, int, Task<T>> publishAndWait) where T : IMessage
         {
             var name = $"{GetType().Name}.{MethodBase.GetCurrentMethod().Name}.{message.ReplyQueue}";
-            var transaction = Agent.Tracer.CurrentTransaction; 
-            
+            var transaction = Agent.Tracer.CurrentTransaction;             
             if (transaction != null)
             {
-                await PublishMessageAndWait(message, destination, forceDestination, milliSecondsTimeout, publishAndWait, transaction, name);
+                return await PublishMessageAndWait(message, destination, forceDestination, milliSecondsTimeout, publishAndWait, transaction, name);
             }
-
             return await Agent.Tracer.CaptureTransaction(name, TransactionType, 
                 async () => await PublishAndWait(message, destination, forceDestination, milliSecondsTimeout, publishAndWait));
         }

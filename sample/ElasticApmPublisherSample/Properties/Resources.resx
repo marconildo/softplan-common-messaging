@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<root>
+    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+        <xsd:element name="root" msdata:IsDataSet="true">
+            
+        </xsd:element>
+    </xsd:schema>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <data name="StartingApplication" xml:space="preserve">
+        <value>Starting application.</value>
+    </data>
+    <data name="ApplicationError" xml:space="preserve">
+        <value>Ops. Some problem occurred..</value>
+    </data>
+    <data name="SettingApmAgentConfiguration" xml:space="preserve">
+        <value>Setting Apm agent configuration.</value>
+    </data>
+    <data name="PublishingMessage" xml:space="preserve">
+        <value>Publishing message.</value>
+    </data>
+    <data name="MessageSuccessfullyProcessed" xml:space="preserve">
+        <value>Message successfully processed.</value>
+    </data>
+    <data name="MessageHandlingError" xml:space="preserve">
+        <value>Error while processing message.</value>
+    </data>
+    <data name="ClosingApplication" xml:space="preserve">
+        <value>Press 'c' to close or any key to send other message.</value>
+    </data>
+    <data name="ApplicationClosed" xml:space="preserve">
+        <value>Application closed.</value>
+    </data>
+    <data name="ActionType" xml:space="preserve">
+        <value>Press '1' to send a message or '2' to send a message and wait response.</value>
+    </data>
+    <data name="InvalidIntValue" xml:space="preserve">
+        <value>{0} is not a valid integer.</value>
+    </data>
+    <data name="FibonacciResult" xml:space="preserve">
+        <value>Fibonacci to {0} is {1}.</value>
+    </data>
+    <data name="FibonacciError" xml:space="preserve">
+        <value>Error to calc fibonacci to {0}.</value>
+    </data>
+    <data name="WaitingFibonacciNumber" xml:space="preserve">
+        <value>Press 'c' to close application or any number to calc Fibonacci.</value>
+    </data>
+    <data name="ResponseReceived" xml:space="preserve">
+        <value>Response received.</value>
+    </data>
+</root>

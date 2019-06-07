@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace rpcExample.Properties {
+namespace ElasticApmConsumerSample.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace rpcExample.Properties {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("rpcExample.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ElasticApmConsumerSample.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,83 +61,83 @@ namespace rpcExample.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Aplicação encerrada com sucesso..
+        ///   Looks up a localized string similar to Application closed..
         /// </summary>
-        public static string AplicacaoEncerrada {
+        public static string ApplicationClosed {
             get {
-                return ResourceManager.GetString("AplicacaoEncerrada", resourceCulture);
+                return ResourceManager.GetString("ApplicationClosed", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Erro ao executar aplicação. Detalhes: ${0}.
+        ///   Looks up a localized string similar to Ops. Some problem occurred...
         /// </summary>
-        public static string ErroAoExecutarAplicacao {
+        public static string ApplicationError {
             get {
-                return ResourceManager.GetString("ErroAoExecutarAplicacao", resourceCulture);
+                return ResourceManager.GetString("ApplicationError", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Erro ao calcular fibonacci: {0}.
+        ///   Looks up a localized string similar to Press Enter to close application..
         /// </summary>
-        public static string ErroCalcularFibonacci {
+        public static string ClosingApplication {
             get {
-                return ResourceManager.GetString("ErroCalcularFibonacci", resourceCulture);
+                return ResourceManager.GetString("ClosingApplication", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Iniciando aplicação.
+        ///   Looks up a localized string similar to The number should be greater than 0..
         /// </summary>
-        public static string IniciandoAplicacao {
+        public static string InvalidFibValue {
             get {
-                return ResourceManager.GetString("IniciandoAplicacao", resourceCulture);
+                return ResourceManager.GetString("InvalidFibValue", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} não é um inteiro válido.
+        ///   Looks up a localized string similar to Error while processing message: {0}..
         /// </summary>
-        public static string InteiroInvalido {
+        public static string MessageHandlingError {
             get {
-                return ResourceManager.GetString("InteiroInvalido", resourceCulture);
+                return ResourceManager.GetString("MessageHandlingError", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Fibpnacci requer que o número seja maior que zero..
+        ///   Looks up a localized string similar to Message successfully processed: {0}..
         /// </summary>
-        public static string NumeroMenorQueZero {
+        public static string MessageSuccessfullyProcessed {
             get {
-                return ResourceManager.GetString("NumeroMenorQueZero", resourceCulture);
+                return ResourceManager.GetString("MessageSuccessfullyProcessed", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to [.] Publicando mensagem para [testQueue123] ....
+        ///   Looks up a localized string similar to Publishing message..
         /// </summary>
-        public static string PublicandoMensagem {
+        public static string PublishingMessage {
             get {
-                return ResourceManager.GetString("PublicandoMensagem", resourceCulture);
+                return ResourceManager.GetString("PublishingMessage", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Fibonacci para {0} é igual a {1}.
+        ///   Looks up a localized string similar to Setting Apm agent configuration..
         /// </summary>
-        public static string ResultadoFibonacci {
+        public static string SettingApmAgentConfiguration {
             get {
-                return ResourceManager.GetString("ResultadoFibonacci", resourceCulture);
+                return ResourceManager.GetString("SettingApmAgentConfiguration", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Rodando aplicação. Digite (quit) para encerrar ou qualquer numero apra calcular Fibonacci..
+        ///   Looks up a localized string similar to Starting application..
         /// </summary>
-        public static string RodandoAplicacao {
+        public static string StartingApplication {
             get {
-                return ResourceManager.GetString("RodandoAplicacao", resourceCulture);
+                return ResourceManager.GetString("StartingApplication", resourceCulture);
             }
         }
     }
