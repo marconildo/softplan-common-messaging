@@ -6,5 +6,6 @@ namespace Softplan.Common.Messaging.Abstractions.Constants
         public static string MessageBrokerUrl => "MESSAGE_BROKER_URL";
         public static string MessageBrokerApiUrl => "MESSAGE_BROKER_API_URL";
         public static string ApmProvider => "APM_PROVIDER";
+        public static string ApmTraceAsyncTransaction => "APM_TRACE_ASYNC_TRANSACTIONS";
     }
 }

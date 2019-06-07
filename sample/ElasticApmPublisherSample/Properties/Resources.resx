@@ -36,14 +36,11 @@
     <data name="MessageHandlingError" xml:space="preserve">
         <value>Error while processing message.</value>
     </data>
-    <data name="ClosingApplication" xml:space="preserve">
-        <value>Press 'c' to close or any key to send other message.</value>
-    </data>
     <data name="ApplicationClosed" xml:space="preserve">
         <value>Application closed.</value>
     </data>
-    <data name="ActionType" xml:space="preserve">
-        <value>Press '1' to send a message or '2' to send a message and wait response.</value>
+    <data name="OptionsMenu" xml:space="preserve">
+        <value>Press '1' to send an async message, '2' to send a message and wait response or 'c' to close.</value>
     </data>
     <data name="InvalidIntValue" xml:space="preserve">
         <value>{0} is not a valid integer.</value>
@@ -55,9 +52,12 @@
         <value>Error to calc fibonacci to {0}.</value>
     </data>
     <data name="WaitingFibonacciNumber" xml:space="preserve">
-        <value>Press 'c' to close application or any number to calc Fibonacci.</value>
+        <value>Press 'b' to close application or any number to calc Fibonacci.</value>
     </data>
     <data name="ResponseReceived" xml:space="preserve">
         <value>Response received.</value>
+    </data>
+    <data name="SendMessageOrKill" xml:space="preserve">
+        <value>Press 'b' to return to main menu or any key to send other message.</value>
     </data>
 </root>

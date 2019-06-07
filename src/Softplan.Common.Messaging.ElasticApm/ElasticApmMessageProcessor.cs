@@ -3,22 +3,24 @@ using System.Diagnostics;
 using System.Reflection;
 using Elastic.Apm;
 using Elastic.Apm.Api;
+using Microsoft.Extensions.Configuration;
+using Softplan.Common.Messaging.Abstractions.Constants;
 using Softplan.Common.Messaging.Abstractions.Interfaces;
-using Softplan.Common.Messaging.ElasticApm.Constants;
 
 namespace Softplan.Common.Messaging.ElasticApm
 {
     public class ElasticApmMessageProcessor : IMessageProcessor
     {
         private static string TransactionType => "ElasticProccessMessage";
-        
+
         public void ProcessMessage(IMessage message, IPublisher publisher, Action<IMessage, IPublisher> processMessage)
         {            
             var method = new StackFrame().GetMethod();
             var name = GetName(message, method, processMessage.GetMethodInfo().Name);
-            if (message.Headers.ContainsKey(ElasticApmConstants.TraceParent))
+            var traceAsyncTransaction = (bool) message.Headers[ApmConstants.ApmTraceAsyncTransaction];
+            if (message.Headers.ContainsKey(ApmConstants.TraceParent) && traceAsyncTransaction)
             {
-                var traceParent = message.Headers[ElasticApmConstants.TraceParent].ToString();
+                var traceParent = message.Headers[ApmConstants.TraceParent].ToString();
                 Agent.Tracer.CaptureTransaction(name, TransactionType,
                     () => processMessage(message, publisher),
                     DistributedTracingData.TryDeserializeFromString(traceParent));                                
@@ -34,10 +36,10 @@ namespace Softplan.Common.Messaging.ElasticApm
         {            
             var method = new StackFrame().GetMethod();
             var name = GetName(message, method, handleProcessError.GetMethodInfo().Name);
-            if (!message.Headers.ContainsKey(ElasticApmConstants.TraceParent))
+            if (!message.Headers.ContainsKey(ApmConstants.TraceParent))
                 return Agent.Tracer.CaptureTransaction(name, TransactionType,
                     () => handleProcessError(message, publisher, error));
-            var traceParent = message.Headers[ElasticApmConstants.TraceParent].ToString();
+            var traceParent = message.Headers[ApmConstants.TraceParent].ToString();
             return Agent.Tracer.CaptureTransaction(name, TransactionType, 
                 () => handleProcessError(message, publisher, error),
                 DistributedTracingData.TryDeserializeFromString(traceParent));
@@ -45,8 +47,8 @@ namespace Softplan.Common.Messaging.ElasticApm
         
         private static string GetName(IMessage message, MemberInfo method, string actionName)
         {            
-            var name = message.Headers.ContainsKey(ElasticApmConstants.TransactionName)
-                ? message.Headers[ElasticApmConstants.TransactionName].ToString()
+            var name = message.Headers.ContainsKey(ApmConstants.TransactionName)
+                ? message.Headers[ApmConstants.TransactionName].ToString()
                 : $"{method.DeclaringType}.{method.Name}.{actionName}";
             return name;
         }

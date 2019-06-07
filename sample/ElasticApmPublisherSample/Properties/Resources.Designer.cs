@@ -61,15 +61,6 @@ namespace ElasticApmPublisherSample.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Press &apos;1&apos; to send a message or &apos;2&apos; to send a message and wait response..
-        /// </summary>
-        public static string ActionType {
-            get {
-                return ResourceManager.GetString("ActionType", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Application closed..
         /// </summary>
         public static string ApplicationClosed {
@@ -84,15 +75,6 @@ namespace ElasticApmPublisherSample.Properties {
         public static string ApplicationError {
             get {
                 return ResourceManager.GetString("ApplicationError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Press &apos;c&apos; to close or any key to send other message..
-        /// </summary>
-        public static string ClosingApplication {
-            get {
-                return ResourceManager.GetString("ClosingApplication", resourceCulture);
             }
         }
         
@@ -142,6 +124,15 @@ namespace ElasticApmPublisherSample.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Press &apos;1&apos; to send an async message, &apos;2&apos; to send a message and wait response or &apos;c&apos; to close..
+        /// </summary>
+        public static string OptionsMenu {
+            get {
+                return ResourceManager.GetString("OptionsMenu", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Publishing message..
         /// </summary>
         public static string PublishingMessage {
@@ -156,6 +147,15 @@ namespace ElasticApmPublisherSample.Properties {
         public static string ResponseReceived {
             get {
                 return ResourceManager.GetString("ResponseReceived", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Press &apos;b&apos; to return to main menu..
+        /// </summary>
+        public static string SendMessageOrKill {
+            get {
+                return ResourceManager.GetString("SendMessageOrKill", resourceCulture);
             }
         }
         
@@ -178,7 +178,7 @@ namespace ElasticApmPublisherSample.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Press &apos;c&apos; to close application or any number to calc Fibonacci..
+        ///   Looks up a localized string similar to Press &apos;b&apos; to close application or any number to calc Fibonacci..
         /// </summary>
         public static string WaitingFibonacciNumber {
             get {

@@ -4,15 +4,22 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Elastic.Apm;
 using Elastic.Apm.Api;
+using Microsoft.Extensions.Configuration;
+using Softplan.Common.Messaging.Abstractions.Constants;
 using Softplan.Common.Messaging.Abstractions.Interfaces;
-using Softplan.Common.Messaging.ElasticApm.Constants;
 
 namespace Softplan.Common.Messaging.ElasticApm
 {
     public class ElasticApmMessagePublisher : IMessagePublisher
     {
+        private readonly IConfiguration _config;
         private static string TransactionType => "ElasticCreateTransactionMessage";
         private static string SpanType => "ElasticPublishMessage";
+
+        public ElasticApmMessagePublisher(IConfiguration config)
+        {
+            _config = config;
+        }
         
         public void Publish(IMessage message, string destination, bool forceDestination, Action<IMessage, string, bool> publish)
         {
@@ -47,20 +54,22 @@ namespace Softplan.Common.Messaging.ElasticApm
         
         private static string GetName(IMessage message, MemberInfo method, string actionName)
         {            
-            var name = message.Headers.ContainsKey(ElasticApmConstants.TransactionName)
-                ? message.Headers[ElasticApmConstants.TransactionName].ToString()
+            var name = message.Headers.ContainsKey(ApmConstants.TransactionName)
+                ? message.Headers[ApmConstants.TransactionName].ToString()
                 : $"{method.DeclaringType}.{method.Name}.{actionName}";
             return name;
         }        
 
-        private static void PublishMessage(IMessage message, string destination, bool forceDestination, Action<IMessage, string, bool> publish,
+        private void PublishMessage(IMessage message, string destination, bool forceDestination, Action<IMessage, string, bool> publish,
             IExecutionSegment transaction, string name)
         {
             var span = transaction.StartSpan(name, SpanType);
             try
             {
                 var traceParent = $"00-{transaction.TraceId}-{span.Id}-01";
-                message.Headers[ElasticApmConstants.TraceParent] = traceParent;
+                var traceAsyncTransaction = _config.GetValue<bool>(EnvironmentConstants.ApmTraceAsyncTransaction);
+                message.Headers[ApmConstants.TraceParent] = traceParent;
+                message.Headers[ApmConstants.ApmTraceAsyncTransaction] = traceAsyncTransaction;
                 publish(message, destination, forceDestination);
             }
             catch (Exception ex)
@@ -74,14 +83,15 @@ namespace Softplan.Common.Messaging.ElasticApm
             }
         }
         
-        private static async Task<T> PublishMessageAndWait<T>(IMessage message, string destination, bool forceDestination,
+        private async Task<T> PublishMessageAndWait<T>(IMessage message, string destination, bool forceDestination,
             int milliSecondsTimeout, Func<IMessage, string, bool, int, Task<T>> publishAndWait, IExecutionSegment transaction, string name) where T : IMessage
         {
             var span = transaction.StartSpan(name, SpanType);
             try
             {
                 var traceParent = $"00-{transaction.TraceId}-{span.Id}-01";
-                message.Headers[ElasticApmConstants.TraceParent] = traceParent;
+                message.Headers[ApmConstants.TraceParent] = traceParent;
+                message.Headers[ApmConstants.ApmTraceAsyncTransaction] = true;
                 return await publishAndWait(message, destination, forceDestination, milliSecondsTimeout);
             }
             catch (Exception ex)

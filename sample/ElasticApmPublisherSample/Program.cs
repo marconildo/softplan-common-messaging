@@ -8,9 +8,9 @@ using ElasticApmPublisherSample.Properties;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Softplan.Common.Messaging;
+using Softplan.Common.Messaging.Abstractions.Constants;
 using Softplan.Common.Messaging.Abstractions.Enuns;
 using Softplan.Common.Messaging.Abstractions.Interfaces;
-using Softplan.Common.Messaging.ElasticApm.Constants;
 using Softplan.Common.Messaging.Extensions;
 
 namespace ElasticApmPublisherSample
@@ -28,9 +28,13 @@ namespace ElasticApmPublisherSample
             {                
                 Console.WriteLine(Resources.StartingApplication);
                 var config = GetConfiguration(AppSettingsPublisher);
-                SetApmAgentConfiguration(config);                
-                var action = GetAction();
-                ExecuteAction(action, config);
+                SetApmAgentConfiguration(config);
+                string action;
+                do
+                {
+                    action = GetAction();
+                    ExecuteAction(action, config);
+                } while (!string.Equals(action, "c", StringComparison.OrdinalIgnoreCase));                
                 Console.WriteLine(Resources.ApplicationClosed);
                 Environment.Exit(0);
             }
@@ -68,10 +72,11 @@ namespace ElasticApmPublisherSample
             string action;
             do
             {
-                Console.WriteLine(Resources.ActionType);
+                Console.WriteLine(Resources.OptionsMenu);
                 action = Console.ReadLine();
             } while (!string.Equals(action, "1", StringComparison.OrdinalIgnoreCase) &&
-                     !string.Equals(action, "2", StringComparison.OrdinalIgnoreCase));
+                     !string.Equals(action, "2", StringComparison.OrdinalIgnoreCase) &&
+                     !string.Equals(action, "c", StringComparison.OrdinalIgnoreCase));
 
             return action;
         }
@@ -103,9 +108,9 @@ namespace ElasticApmPublisherSample
                 var method = new StackFrame().GetMethod();
                 var message = GetSimpleMessage(method);
                 publisher.Publish(message, SimpleMessageDestination);
-                Console.WriteLine(Resources.ClosingApplication);
+                Console.WriteLine(Resources.SendMessageOrKill);
                 quit = Console.ReadLine();
-            } while (!string.Equals(quit, "c", StringComparison.OrdinalIgnoreCase));
+            } while (!string.Equals(quit, "b", StringComparison.OrdinalIgnoreCase));
         }
 
         private static SimpleMessage GetSimpleMessage(MemberInfo method)
@@ -114,7 +119,7 @@ namespace ElasticApmPublisherSample
             var message = new SimpleMessage
             {
                 Text = Text,
-                Headers = {[ElasticApmConstants.TransactionName] = name} //Is recommended set the transaction name to be easy localize data.
+                Headers = {[ApmConstants.TransactionName] = name} //Is recommended set the transaction name to be easy localize data.
             };
             return message;
         }
@@ -122,12 +127,12 @@ namespace ElasticApmPublisherSample
         private static void PublishMessageAndWaitResponse(IConfiguration config)
         {                                         
             var publisher = GetPublisher(config);
-            var quit = string.Empty;
+            string quit;
             do
             {
                 Console.WriteLine(Resources.WaitingFibonacciNumber);
-                var value = Console.ReadLine();
-                if (string.Equals(value, "c", StringComparison.OrdinalIgnoreCase)) break;
+                var value = quit = Console.ReadLine();
+                if (string.Equals(value, "b", StringComparison.OrdinalIgnoreCase)) break;
                 if (!GetValue(value, out var fibNum)) continue;  
                 Console.WriteLine(Resources.PublishingMessage); 
                 var method = new StackFrame().GetMethod();
@@ -136,10 +141,8 @@ namespace ElasticApmPublisherSample
                 Console.WriteLine(Resources.ResponseReceived); 
                 Console.WriteLine(string.IsNullOrEmpty(reply.ErrorMessage)
                     ? string.Format(Resources.FibonacciResult, fibNum, reply.Number)
-                    : string.Format(Resources.FibonacciError, reply.ErrorMessage));                                               
-                Console.WriteLine(Resources.ClosingApplication);
-                quit = Console.ReadLine();
-            } while (!string.Equals(quit, "c", StringComparison.OrdinalIgnoreCase));
+                    : string.Format(Resources.FibonacciError, reply.ErrorMessage));
+            } while (!string.Equals(quit, "b", StringComparison.OrdinalIgnoreCase));
         }                
         
         private static bool GetValue(string value, out int fibNum)
@@ -155,7 +158,7 @@ namespace ElasticApmPublisherSample
             var message = new FibMessage
             {
                 Number = fibNum,
-                Headers = {[ElasticApmConstants.TransactionName] = name} //Is recommended set the transaction name to be easy localize data.
+                Headers = {[ApmConstants.TransactionName] = name} //Is recommended set the transaction name to be easy localize data.
             };
             return message;
         }

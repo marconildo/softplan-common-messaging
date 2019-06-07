@@ -34,7 +34,7 @@ namespace Softplan.Common.Messaging
             switch (_apmProvider)
             {
                 case ApmProviders.ElasticApm:
-                    return new ElasticApmMessagePublisher();
+                    return new ElasticApmMessagePublisher(config);
                 default:
                     throw new ArgumentOutOfRangeException(Resources.InvalidApmProvider);
             }
