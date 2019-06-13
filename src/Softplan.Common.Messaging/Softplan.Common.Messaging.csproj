@@ -47,6 +47,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Softplan.Common.Messaging.Abstractions\Softplan.Common.Messaging.Abstractions.csproj" />
+    <ProjectReference Include="..\Softplan.Common.Messaging.ElasticApm\Softplan.Common.Messaging.ElasticApm.csproj" />
+    <ProjectReference Include="..\Softplan.Common.Messaging.RabbitMq\Softplan.Common.Messaging.RabbitMq.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">
         <DesignTime>True</DesignTime>
         <AutoGen>True</AutoGen>
@@ -55,8 +61,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Softplan.Common.Messaging.Abstractions\Softplan.Common.Messaging.Abstractions.csproj" />
-    <ProjectReference Include="..\Softplan.Common.Messaging.ElasticApm\Softplan.Common.Messaging.ElasticApm.csproj" />
-    <ProjectReference Include="..\Softplan.Common.Messaging.RabbitMq\Softplan.Common.Messaging.RabbitMq.csproj" />
+    <EmbeddedResource Update="Properties\Resources.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
+    
 </Project>
