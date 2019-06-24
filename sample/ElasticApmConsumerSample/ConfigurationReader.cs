@@ -26,6 +26,7 @@ namespace ElasticApmConsumerSample
         public string SecretToken { get; set; }
         public bool CaptureHeaders { get; set; }
         public double TransactionSampleRate { get; set; }
+        public double MetricsIntervalInMillisecond { get; }
 
         private ConfigurationKeyValue Read(string key) => Kv(key, _configuration[key], Origin);
         
