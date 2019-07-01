@@ -106,6 +106,15 @@ namespace rpcExample.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Fibpnacci requer que o número seja maior que zero..
+        /// </summary>
+        public static string NumeroMenorQueZero {
+            get {
+                return ResourceManager.GetString("NumeroMenorQueZero", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to [.] Publicando mensagem para [testQueue123] ....
         /// </summary>
         public static string PublicandoMensagem {

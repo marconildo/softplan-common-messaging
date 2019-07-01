@@ -2,12 +2,11 @@
 
     <PropertyGroup>
         <TargetFramework>netcoreapp2.2</TargetFramework>
+
+        <IsPackable>false</IsPackable>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="FluentAssertions" Version="5.6.0" />
-      <PackageReference Include="Moq" Version="4.10.1" />
-      <PackageReference Include="NBuilder" Version="6.0.0" />
       <PackageReference Include="Pose" Version="1.2.1" />
     </ItemGroup>
 

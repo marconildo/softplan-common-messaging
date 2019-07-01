@@ -6,7 +6,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Internal;
 using Moq;
 using RabbitMQ.Client;
-using Softplan.Common.Messaging.RabbitMq.Abstractions;
+using Softplan.Common.Messaging.Abstractions;
+using Softplan.Common.Messaging.Abstractions.Constants;
+using Softplan.Common.Messaging.Abstractions.Interfaces;
 using Softplan.Common.Messaging.RabbitMq.Tests.Properties;
 using Xunit;
 
@@ -17,8 +19,11 @@ namespace Softplan.Common.Messaging.RabbitMq.Tests
         private Mock<ILoggerFactory> _loggerFactoryMock;
         private Mock<IConnectionFactory> _connectionFactoryMock;
         private Mock<IConnection> _connectionMock;
-        private Mock<IConfiguration> _settingsMock;
+        private Mock<IConfiguration> _configMock;
         private Mock<ILogger<RabbitMqBuilder>> _loggerMock;
+        private Mock<IMessageProcessor> _messageProcessorMock;
+        private Mock<IMessagePublisher> _messagePublisherMock;
+        private Mock<IMessagingWorkersFactory> _messagingWorkersFactoryMock;
         private RabbitMqBuilder _builder;
         
         private const string RabbitUrlValue = "amqp://localhost";
@@ -36,14 +41,19 @@ namespace Softplan.Common.Messaging.RabbitMq.Tests
             SetupLoggerFactoryMock(mockBehavior);
             SetupConnectionMock(mockBehavior);
             SetupConnectionFactoryMock(mockBehavior);
-            SetupSettingsMock(mockBehavior);
-        }                    
+            SetupSettingsMock(mockBehavior); 
+            SetupMessagingWorkersFactoryMock(mockBehavior);                            
+            _builder = new RabbitMqBuilder(_configMock.Object, _loggerFactoryMock.Object, _messagingWorkersFactoryMock.Object)
+            {
+                ConnectionFactory = _connectionFactoryMock.Object
+            };
+        }        
 
 
         [Fact]
         public void When_Create_Builder_Without_Logger_Factory_Should_Throw_Expected_exception()
         {
-            Action action = () => new RabbitMqBuilder(_settingsMock.Object, null)
+            Action action = () => new RabbitMqBuilder(_configMock.Object, null, _messagingWorkersFactoryMock.Object)
             {
                 ConnectionFactory = _connectionFactoryMock.Object
             };
@@ -57,7 +67,7 @@ namespace Softplan.Common.Messaging.RabbitMq.Tests
         public void When_Create_Builder_With_Logger_Factory_Should_Create_Logger()
         {
             _loggerFactoryMock.Invocations.Clear();
-            var amqpBuilder = new RabbitMqBuilder(_settingsMock.Object, _loggerFactoryMock.Object)
+            var amqpBuilder = new RabbitMqBuilder(_configMock.Object, _loggerFactoryMock.Object, _messagingWorkersFactoryMock.Object)
             {
                 ConnectionFactory = _connectionFactoryMock.Object
             };
@@ -68,14 +78,14 @@ namespace Softplan.Common.Messaging.RabbitMq.Tests
         [Fact]
         public void When_Create_Builder_Without_Connection_Factory_Should_Get_RabbitUrlKey_Configuration_Value()
         {
-            _settingsMock.Invocations.Clear();
+            _configMock.Invocations.Clear();
             try
             {
-                var amqpBuilder = new RabbitMqBuilder(_settingsMock.Object, _loggerFactoryMock.Object);
+                var amqpBuilder = new RabbitMqBuilder(_configMock.Object, _loggerFactoryMock.Object, _messagingWorkersFactoryMock.Object);
             }
             catch //Should throws exception because the new ConnectionFactory could not CreateConnection.
             {
-                _settingsMock.Verify(s => s.GetSection(EnvironmentConstants.MessageBrokerUrl), Times.Once);
+                _configMock.Verify(s => s.GetSection(EnvironmentConstants.MessageBrokerUrl), Times.Once);
             }
         }
         
@@ -101,7 +111,7 @@ namespace Softplan.Common.Messaging.RabbitMq.Tests
         {
             var manager = _builder.BuildApiManager();
             
-            _settingsMock.Verify(s => s.GetSection(EnvironmentConstants.MessageBrokerApiUrl), Times.Once);
+            _configMock.Verify(s => s.GetSection(EnvironmentConstants.MessageBrokerApiUrl), Times.Once);
         }
         
         [Fact]
@@ -142,6 +152,7 @@ namespace Softplan.Common.Messaging.RabbitMq.Tests
         [Fact]
         public void When_BuildConsumer_Should_Create_Model_As_Expected()
         {
+            _connectionMock.Invocations.Clear();
             var consumer = _builder.BuildConsumer();
 
             _connectionMock.Verify(c => c.CreateModel(), Times.Exactly(2));
@@ -155,6 +166,25 @@ namespace Softplan.Common.Messaging.RabbitMq.Tests
             var consumer = _builder.BuildConsumer();
 
             _connectionFactoryMock.Verify(c => c.CreateConnection(), Times.Once);
+            _connectionFactoryMock.VerifyNoOtherCalls();
+        }
+        
+        [Fact]
+        public void When_BuildConsumer_Should_Get_MessageProcessor()
+        {
+            _messagingWorkersFactoryMock.Invocations.Clear();
+            var consumer = _builder.BuildConsumer();
+
+            _messagingWorkersFactoryMock.Verify(c => c.GetMessageProcessor(_configMock.Object), Times.Once);
+        }
+        
+        [Fact]
+        public void When_BuildConsumer_Should_Get_MessagePublisher()
+        {
+            _messagingWorkersFactoryMock.Invocations.Clear();
+            var consumer = _builder.BuildConsumer();
+
+            _messagingWorkersFactoryMock.Verify(c => c.GetMessagePublisher(_configMock.Object), Times.Once);
         }
         
         
@@ -206,6 +236,16 @@ namespace Softplan.Common.Messaging.RabbitMq.Tests
             _connectionFactoryMock.Verify(c => c.CreateConnection(), Times.Once);
         }
         
+        [Fact]
+        public void When_BuildPublisher_Should_Get_MessagePublisher()
+        {
+            _messagingWorkersFactoryMock.Invocations.Clear();
+            var publisher = _builder.BuildPublisher();
+
+            _messagingWorkersFactoryMock.Verify(c => c.GetMessagePublisher(_configMock.Object), Times.Once);
+            _messagingWorkersFactoryMock.VerifyNoOtherCalls();
+        }
+        
         
         [Fact]
         public void When_BuildSerializer_Should_Return_Expected_Type()
@@ -246,15 +286,22 @@ namespace Softplan.Common.Messaging.RabbitMq.Tests
 
         private void SetupSettingsMock(MockBehavior mockBehavior)
         {
-            _settingsMock = new Mock<IConfiguration>(mockBehavior);
-            _settingsMock.Setup(s => s.GetSection(EnvironmentConstants.MessageBrokerUrl))
+            _configMock = new Mock<IConfiguration>(mockBehavior);
+            _configMock.Setup(s => s.GetSection(EnvironmentConstants.MessageBrokerUrl))
                 .Returns(GetMockConfigSection(RabbitUrlValue));
-            _settingsMock.Setup(s => s.GetSection(EnvironmentConstants.MessageBrokerApiUrl))
-                .Returns(GetMockConfigSection(RabbitApiUrlValue));
-            _builder = new RabbitMqBuilder(_settingsMock.Object, _loggerFactoryMock.Object)
-            {
-                ConnectionFactory = _connectionFactoryMock.Object
-            };
+            _configMock.Setup(s => s.GetSection(EnvironmentConstants.MessageBrokerApiUrl))
+                .Returns(GetMockConfigSection(RabbitApiUrlValue));            
+        }
+        
+        private void SetupMessagingWorkersFactoryMock(MockBehavior mockBehavior)
+        {
+            _messageProcessorMock = new Mock<IMessageProcessor>(mockBehavior);
+            _messagingWorkersFactoryMock = new Mock<IMessagingWorkersFactory>(mockBehavior);
+            _messagingWorkersFactoryMock.Setup(m => m.GetMessageProcessor(_configMock.Object))
+                .Returns(_messageProcessorMock.Object);
+            _messagePublisherMock = new Mock<IMessagePublisher>(mockBehavior);
+            _messagingWorkersFactoryMock.Setup(m => m.GetMessagePublisher(_configMock.Object))
+                .Returns(_messagePublisherMock.Object);
         }
         
         private static IConfigurationSection GetMockConfigSection(string returnValue)

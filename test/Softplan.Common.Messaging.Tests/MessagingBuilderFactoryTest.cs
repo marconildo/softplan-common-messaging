@@ -4,9 +4,9 @@ using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Softplan.Common.Messaging.Abstractions.Constants;
 using Softplan.Common.Messaging.Properties;
 using Softplan.Common.Messaging.RabbitMq;
-using Softplan.Common.Messaging.RabbitMq.Abstractions;
 using Xunit;
 
 namespace Softplan.Common.Messaging.Tests

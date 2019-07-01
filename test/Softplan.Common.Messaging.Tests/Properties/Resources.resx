@@ -19,6 +19,9 @@
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
     <data name="InvalidBrokerExceptionMessage" xml:space="preserve">
-        <value>Failed to convert '{0}' to type 'Softplan.Common.Messaging.RabbitMq.Abstractions.MessageBrokers'.</value>
+        <value>Failed to convert '{0}' to type 'Softplan.Common.Messaging.Abstractions.Enuns.MessageBrokers'.</value>
+    </data>
+    <data name="InvalidProviderExceptionMessage" xml:space="preserve">
+        <value>Failed to convert 'someInvalidProvider' to type 'Softplan.Common.Messaging.Abstractions.Enuns.ApmProviders'.</value>
     </data>
 </root>

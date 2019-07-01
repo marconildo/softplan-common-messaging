@@ -2,19 +2,26 @@ using System;
 using System.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Softplan.Common.Messaging.Abstractions.Constants;
+using Softplan.Common.Messaging.Abstractions.Enuns;
+using Softplan.Common.Messaging.Abstractions.Interfaces;
 using Softplan.Common.Messaging.Extensions;
 using Softplan.Common.Messaging.Properties;
 using Softplan.Common.Messaging.RabbitMq;
-using Softplan.Common.Messaging.RabbitMq.Abstractions;
-using Softplan.Common.Messaging.RabbitMq.Abstractions.Interfaces;
 
 namespace Softplan.Common.Messaging
 {
     public class MessagingBuilderFactory : IMessagingBuilderFactory
     {                
         private MessageBrokers _messageBroker;
+        private readonly IMessagingWorkersFactory _messagingWorkersFactory;
         private string _urlBroker;
         private string _urlApiBroker;
+
+        public MessagingBuilderFactory()
+        {
+            _messagingWorkersFactory = new MessagingWorkersFactory();
+        }
 
         public bool HasConfiguration(IConfiguration config)
         {
@@ -29,7 +36,7 @@ namespace Softplan.Common.Messaging
             switch (_messageBroker)
             {
                 case MessageBrokers.RabbitMq:
-                    return new RabbitMqBuilder(config, loggerFactory);
+                    return new RabbitMqBuilder(config, loggerFactory, _messagingWorkersFactory);
                 default:
                     throw new ArgumentOutOfRangeException(Resources.InvalidAmqpBroker);
             }

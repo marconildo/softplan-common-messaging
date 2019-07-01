@@ -1,9 +1,9 @@
 using System;
 using System.Text;
 using Newtonsoft.Json;
-using Softplan.Common.Messaging.RabbitMq.Abstractions.Interfaces;
+using Softplan.Common.Messaging.Abstractions.Interfaces;
 
-namespace Softplan.Common.Messaging.RabbitMq.Abstractions
+namespace Softplan.Common.Messaging.Abstractions
 {
     public class MessageSerializer : ISerializer
     {

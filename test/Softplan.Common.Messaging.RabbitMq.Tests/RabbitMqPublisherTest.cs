@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Moq;
 using RabbitMQ.Client;
-using Softplan.Common.Messaging.RabbitMq.Abstractions;
-using Softplan.Common.Messaging.RabbitMq.Abstractions.Interfaces;
+using Softplan.Common.Messaging.Abstractions;
+using Softplan.Common.Messaging.Abstractions.Interfaces;
 using Softplan.Common.Messaging.RabbitMq.Properties;
 using Xunit;
 
@@ -17,7 +17,8 @@ namespace Softplan.Common.Messaging.RabbitMq.Tests
         private Mock<IModel> _channelMock;
         private Mock<IQueueApiManager> _managerMock;
         private Mock<ISerializer> _serializerMock;
-        private readonly IPublisher _publisher;
+        private Mock<IMessagePublisher> _messagePublisherMock;
+        private IPublisher _publisher;
         private IBasicProperties _publishedMsgProps;
 
         private const string TestQueue = "testQueue";
@@ -28,14 +29,27 @@ namespace Softplan.Common.Messaging.RabbitMq.Tests
 
         public RabbitMqPublisherTest()
         {
-            const MockBehavior behavior = MockBehavior.Strict;
-            SetupChannelMock(behavior);
-            SetupSerializerMock(behavior);
-            SetupManagerMock(behavior);            
-            _publisher = new RabbitMqPublisher(_channelMock.Object, _serializerMock.Object, _managerMock.Object);
+            const MockBehavior mockBehavior = MockBehavior.Strict;
+            SetupChannelMock(mockBehavior);
+            SetupSerializerMock(mockBehavior);
+            SetupManagerMock(mockBehavior);                                      
+            _publisher = new RabbitMqPublisher(_channelMock.Object, _serializerMock.Object, _managerMock.Object, new DefaultMessagePublisher());
         }
-        
-        
+                        
+
+        [Fact]
+        public void When_Publish_Should_Call_Publisher_Publish()
+        {
+            SetupMessagePublisherMock(MockBehavior.Default);
+            var message = GetMessage();
+            _publisher = new RabbitMqPublisher(_channelMock.Object, _serializerMock.Object, _managerMock.Object, _messagePublisherMock.Object);
+            
+            _publisher.Publish(message.Object, TestQueue);
+
+            _messagePublisherMock.Verify(m => m.Publish(It.IsAny<IMessage>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<Action<IMessage, string, bool>>()), Times.Once());
+        }
+
+
         [Fact]
         public void When_Publish_Should_Publish_To_Create_Basic_Properties()
         {
@@ -156,6 +170,19 @@ namespace Softplan.Common.Messaging.RabbitMq.Tests
                 .Throw<ArgumentException>()
                 .WithMessage(Resources.MessageDestionationIsNull);
         }
+        
+        
+        [Fact]
+        public void When_PublishAndWait_Should_Call_Publisher_PublishAndWait()
+        {
+            SetupMessagePublisherMock(MockBehavior.Default);
+            var message = GetMessage();
+            _publisher = new RabbitMqPublisher(_channelMock.Object, _serializerMock.Object, _managerMock.Object, _messagePublisherMock.Object);                      
+                        
+            _publisher.PublishAndWait<Message>(message.Object, NewTestQueue, true, 10);
+
+            _messagePublisherMock.Verify(m => m.PublishAndWait(It.IsAny<IMessage>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<Func<IMessage, string, bool, int, Task<Message>>>()), Times.Once);
+        }
 
         [Fact]
         public void When_PublishAndWait_Should_Declare_Queue()
@@ -238,6 +265,13 @@ namespace Softplan.Common.Messaging.RabbitMq.Tests
             _managerMock = new Mock<IQueueApiManager>(behavior);
             _managerMock.Setup(m => m.GetQueueInfo(It.IsAny<string>())).Returns(new QueueInfo());    
             _managerMock.Setup(m => m.EnsureQueue(It.IsAny<string>())).Returns(NewTestQueue);
+        }
+        
+        private void SetupMessagePublisherMock(MockBehavior mockBehavior)
+        {
+            _messagePublisherMock = new Mock<IMessagePublisher>(mockBehavior);
+            _messagePublisherMock.Setup(m => m.Publish(It.IsAny<IMessage>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<Action<IMessage, string, bool>>()));
+            _messagePublisherMock.Setup(m => m.PublishAndWait(It.IsAny<IMessage>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<Func<IMessage, string, bool, int, Task<Message>>>()));
         }
         
         private static Mock<IMessage> GetMessage(string replyQueue = "", string replyToQueue = "")

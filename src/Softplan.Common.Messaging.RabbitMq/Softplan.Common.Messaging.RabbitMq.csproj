@@ -7,8 +7,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
         <PackageReference Include="RabbitMQ.Client" Version="5.1.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Softplan.Common.Messaging.Abstractions\Softplan.Common.Messaging.Abstractions.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -20,6 +23,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Softplan.Common.Messaging.Abstractions\Softplan.Common.Messaging.Abstractions.csproj" />
+        <EmbeddedResource Update="Properties\Resources.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
     </ItemGroup>
 </Project>

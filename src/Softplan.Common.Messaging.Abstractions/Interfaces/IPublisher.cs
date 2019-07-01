@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace Softplan.Common.Messaging.RabbitMq.Abstractions.Interfaces
+namespace Softplan.Common.Messaging.Abstractions.Interfaces
 {
     public interface IPublisher
     {

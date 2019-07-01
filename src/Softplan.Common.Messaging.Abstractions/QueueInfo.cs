@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 
-namespace Softplan.Common.Messaging.RabbitMq.Abstractions
+namespace Softplan.Common.Messaging.Abstractions
 {
     public class QueueInfo
     {

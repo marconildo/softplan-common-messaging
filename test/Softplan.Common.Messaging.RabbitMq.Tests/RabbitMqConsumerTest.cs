@@ -5,7 +5,7 @@ using FluentAssertions;
 using Moq;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using Softplan.Common.Messaging.RabbitMq.Abstractions.Interfaces;
+using Softplan.Common.Messaging.Abstractions.Interfaces;
 using Softplan.Common.Messaging.RabbitMq.Properties;
 using Xunit;
 
@@ -15,7 +15,8 @@ namespace Softplan.Common.Messaging.RabbitMq.Tests
     {
         private class ProtectedConsumer : RabbitMqConsumer
         {
-            public ProtectedConsumer(IModel channel, IPublisher publisher, IBuilder builder, IQueueApiManager manager) : base(channel, publisher, builder, manager)
+            public ProtectedConsumer(IModel channel, IPublisher publisher, IBuilder builder, IQueueApiManager manager, IMessageProcessor messageProcessor) : 
+                base(channel, publisher, builder, manager, messageProcessor)
             {
 
             }
@@ -33,6 +34,7 @@ namespace Softplan.Common.Messaging.RabbitMq.Tests
         private Mock<IProcessor> _processorMock;
         private Mock<IBasicProperties> _basicPropertiesMock;
         private Mock<IMessage> _messageMock;
+        private Mock<IMessageProcessor> _messageProcessorMock;
         private readonly BasicDeliverEventArgs _basicDeliverEventArgs;
         private readonly RabbitMqConsumer _consumer;
         
@@ -54,12 +56,13 @@ namespace Softplan.Common.Messaging.RabbitMq.Tests
             SetupManagerMock(mockBehavior);
             SetupProcessorMock(mockBehavior);
             SetupPublisherMock(mockBehavior);
-            _consumer = new RabbitMqConsumer(_channelMock.Object, _publisherMock.Object, _builderMock.Object, _managerMock.Object);              
+            SetupMessageProcessorMock(mockBehavior);
+            _consumer = new RabbitMqConsumer(_channelMock.Object, _publisherMock.Object, _builderMock.Object, _managerMock.Object, _messageProcessorMock.Object);              
             SetupBasicPropertiesMock(mockBehavior);
             var userData = Encoding.UTF8.GetBytes(UserJson);
             _basicDeliverEventArgs = new BasicDeliverEventArgs(ConsumerTag, 1, false, string.Empty, QueueName, _basicPropertiesMock.Object, userData);
-        }
-        
+        }        
+
 
         [Fact]
         public void When_Create_Consumer_Without_Channel_Should_Return_Expected_Exception()
@@ -88,7 +91,7 @@ namespace Softplan.Common.Messaging.RabbitMq.Tests
         [Fact]
         public void When_Create_Consumer_Should_Set_Empty_ConsumerTag()
         {
-            var consumer = new RabbitMqConsumer(_channelMock.Object,_publisherMock.Object, _builderMock.Object, _managerMock.Object);
+            var consumer = new RabbitMqConsumer(_channelMock.Object,_publisherMock.Object, _builderMock.Object, _managerMock.Object, _messageProcessorMock.Object);
 
             consumer.ConsumerTag.Should().BeEmpty();
         }
@@ -172,10 +175,11 @@ namespace Softplan.Common.Messaging.RabbitMq.Tests
         
         [Fact]
         public void When_Consume_Message_Should_Proccess_Message()
-        {                                    
+        {        
+            _messageProcessorMock.Invocations.Clear();
             ConsumeMessage();
             
-            _processorMock.Verify(p => p.ProcessMessage(_messageMock.Object, _publisherMock.Object), Times.Once);          
+            _messageProcessorMock.Verify(p => p.ProcessMessage(_messageMock.Object, _publisherMock.Object, It.IsAny<Action<IMessage, IPublisher>>()), Times.Once);          
         }
         
         [Fact]
@@ -333,9 +337,9 @@ namespace Softplan.Common.Messaging.RabbitMq.Tests
             _basicPropertiesMock.SetupGet(p => p.ReplyTo).Returns(string.Empty);
         }
         
-        private static void TestAmqpConsumerConstructor(IModel model, IPublisher publisher, IBuilder builder, IQueueApiManager manager, string parameter)
+        private void TestAmqpConsumerConstructor(IModel model, IPublisher publisher, IBuilder builder, IQueueApiManager manager, string parameter)
         {
-            Action action = () => new RabbitMqConsumer(model, publisher, builder, manager);
+            Action action = () => new RabbitMqConsumer(model, publisher, builder, manager, _messageProcessorMock.Object);
             
             action.Should()
                 .Throw<ArgumentNullException>()
@@ -344,7 +348,7 @@ namespace Softplan.Common.Messaging.RabbitMq.Tests
         
         private void ConsumeMessage()
         {
-            var consumer = new ProtectedConsumer(_channelMock.Object, _publisherMock.Object, _builderMock.Object, _managerMock.Object);
+            var consumer = new ProtectedConsumer(_channelMock.Object, _publisherMock.Object, _builderMock.Object, _managerMock.Object, _messageProcessorMock.Object);
             consumer.Start(_processorMock.Object, QueueName);
             consumer.ProtectedOnMessageReceived(_processorMock.Object, QueueName, _basicDeliverEventArgs);
             consumer.Stop();
@@ -352,26 +356,34 @@ namespace Softplan.Common.Messaging.RabbitMq.Tests
         
         private void SetupToConsumeMessageWithErrorAndHandleProccess()
         {
-            _processorMock.Setup(p => p.ProcessMessage(It.IsAny<IMessage>(), It.IsAny<IPublisher>()))
+            _messageProcessorMock.Setup(m => m.ProcessMessage(_messageMock.Object, _publisherMock.Object, It.IsAny<Action<IMessage, IPublisher>>()))
                 .Throws<Exception>();
-            _processorMock.Setup(p => p.HandleProcessError(It.IsAny<IMessage>(), It.IsAny<IPublisher>(), It.IsAny<Exception>()))
+            _messageProcessorMock.Setup(m => m.HandleProcessError(_messageMock.Object, _publisherMock.Object, It.IsAny<Exception>(), It.IsAny<Func<IMessage, IPublisher, Exception, bool>>()))
                 .Returns(true);
         }
         
         private void SetupToConsumeMessageWithErrorAndNotHandleProccess()
         {
-            _processorMock.Setup(p => p.ProcessMessage(It.IsAny<IMessage>(), It.IsAny<IPublisher>()))
+            _messageProcessorMock.Setup(m => m.ProcessMessage(_messageMock.Object, _publisherMock.Object, It.IsAny<Action<IMessage, IPublisher>>()))
                 .Throws<Exception>();
-            _processorMock.Setup(p => p.HandleProcessError(It.IsAny<IMessage>(), It.IsAny<IPublisher>(), It.IsAny<Exception>()))
+            _messageProcessorMock.Setup(m => m.HandleProcessError(_messageMock.Object, _publisherMock.Object, It.IsAny<Exception>(), It.IsAny<Func<IMessage, IPublisher, Exception, bool>>()))
                 .Returns(false);
         }
         
         private void SetupToConsumeMessageWithErrorAndHandleProccessThrowsException()
         {
-            _processorMock.Setup(p => p.ProcessMessage(It.IsAny<IMessage>(), It.IsAny<IPublisher>()))
+            _messageProcessorMock.Setup(m => m.ProcessMessage(_messageMock.Object, _publisherMock.Object, It.IsAny<Action<IMessage, IPublisher>>()))
                 .Throws<Exception>();
-            _processorMock.Setup(p => p.HandleProcessError(It.IsAny<IMessage>(), It.IsAny<IPublisher>(), It.IsAny<Exception>()))
+            _messageProcessorMock.Setup(m => m.HandleProcessError(_messageMock.Object, _publisherMock.Object, It.IsAny<Exception>(), It.IsAny<Func<IMessage, IPublisher, Exception, bool>>()))
                 .Throws<Exception>();
+        }
+        
+        private void SetupMessageProcessorMock(MockBehavior mockBehavior)
+        {
+            _messageProcessorMock = new Mock<IMessageProcessor>(mockBehavior);
+            _messageProcessorMock.Setup(m => m.ProcessMessage(_messageMock.Object, _publisherMock.Object, It.IsAny<Action<IMessage, IPublisher>>()));
+            _messageProcessorMock.Setup(m => m.HandleProcessError(_messageMock.Object, _publisherMock.Object, It.IsAny<Exception>(), It.IsAny<Func<IMessage, IPublisher, Exception, bool>>()))
+                .Returns(true);
         }
     }
 }

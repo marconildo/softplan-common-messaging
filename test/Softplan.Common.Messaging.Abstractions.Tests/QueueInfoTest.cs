@@ -1,6 +1,5 @@
 using FluentAssertions;
 using Newtonsoft.Json;
-using Softplan.Common.Messaging.RabbitMq.Abstractions;
 using Xunit;
 
 namespace Softplan.Common.Messaging.Abstractions.Tests

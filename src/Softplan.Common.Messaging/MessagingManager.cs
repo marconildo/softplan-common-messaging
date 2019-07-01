@@ -4,8 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Softplan.Common.Messaging.Abstractions.Interfaces;
 using Softplan.Common.Messaging.Properties;
-using Softplan.Common.Messaging.RabbitMq.Abstractions.Interfaces;
 
 namespace Softplan.Common.Messaging
 {

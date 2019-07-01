@@ -8,7 +8,7 @@ using FluentAssertions;
 using Moq;
 using Moq.Protected;
 using RabbitMQ.Client;
-using Softplan.Common.Messaging.RabbitMq.Abstractions;
+using Softplan.Common.Messaging.Abstractions;
 using Softplan.Common.Messaging.RabbitMq.Properties;
 using Xunit;
 

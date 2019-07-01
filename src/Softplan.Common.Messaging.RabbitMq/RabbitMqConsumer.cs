@@ -2,7 +2,7 @@ using System;
 using System.Text;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using Softplan.Common.Messaging.RabbitMq.Abstractions.Interfaces;
+using Softplan.Common.Messaging.Abstractions.Interfaces;
 using Softplan.Common.Messaging.RabbitMq.Properties;
 
 namespace Softplan.Common.Messaging.RabbitMq
@@ -13,16 +13,18 @@ namespace Softplan.Common.Messaging.RabbitMq
         private readonly IPublisher _publisher;
         private readonly IBuilder _builder;
         private readonly IQueueApiManager _manager;
+        private readonly IMessageProcessor _messageProcessor;
         public string ConsumerTag { get; private set; }
         
         private const string ParamName = "queue";
 
-        public RabbitMqConsumer(IModel channel, IPublisher publisher, IBuilder builder, IQueueApiManager manager)
+        public RabbitMqConsumer(IModel channel, IPublisher publisher, IBuilder builder, IQueueApiManager manager, IMessageProcessor messageProcessor)
         {
             _channel = channel ?? throw new ArgumentNullException(nameof(channel));
             _publisher = publisher ?? throw new ArgumentNullException(nameof(publisher));
             _builder = builder ?? throw new ArgumentNullException(nameof(builder));
             _manager = manager ?? throw new ArgumentNullException(nameof(manager));
+            _messageProcessor = messageProcessor;
             ConsumerTag = string.Empty;
         }
 
@@ -35,7 +37,7 @@ namespace Softplan.Common.Messaging.RabbitMq
             var consumer = new EventingBasicConsumer(_channel);
             consumer.Received += (channel, args) => OnMessageReceived(processor, queue, args);
             ConsumerTag = _channel.BasicConsume(queue, false, consumer);
-        }   
+        }
         
         public void Stop()
         {
@@ -43,7 +45,6 @@ namespace Softplan.Common.Messaging.RabbitMq
                 _channel.BasicCancel(ConsumerTag);
             ConsumerTag = string.Empty;
         }
-        
 
         protected void OnMessageReceived(IProcessor processor, string queue, BasicDeliverEventArgs args)
         {
@@ -51,7 +52,7 @@ namespace Softplan.Common.Messaging.RabbitMq
             try
             {
                 SetReplyQueue(args, message);
-                processor.ProcessMessage(message, _publisher);
+                _messageProcessor.ProcessMessage(message, _publisher, processor.ProcessMessage);
                 _channel.BasicAck(args.DeliveryTag, false);
             }
             catch (Exception ex)
@@ -59,7 +60,6 @@ namespace Softplan.Common.Messaging.RabbitMq
                 ProccessException(processor, args, message, ex);
             }
         }        
-
 
         private void ValidateConsumerStarted()
         {
@@ -83,7 +83,7 @@ namespace Softplan.Common.Messaging.RabbitMq
         {
             try
             {
-                if (processor.HandleProcessError(message, _publisher, ex))
+                if (_messageProcessor.HandleProcessError(message, _publisher, ex, processor.HandleProcessError))
                     _channel.BasicAck(args.DeliveryTag, false);
                 else
                     _channel.BasicNack(args.DeliveryTag, false, true);

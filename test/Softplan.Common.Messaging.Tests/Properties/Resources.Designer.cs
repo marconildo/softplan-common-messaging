@@ -61,11 +61,20 @@ namespace Softplan.Common.Messaging.Tests.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Failed to convert &apos;{0}&apos; to type &apos;Softplan.Common.Messaging.RabbitMq.Abstractions.MessageBrokers&apos;..
+        ///   Looks up a localized string similar to Failed to convert &apos;{0}&apos; to type &apos;Softplan.Common.Messaging.Abstractions.Enuns.MessageBrokers&apos;..
         /// </summary>
         public static string InvalidBrokerExceptionMessage {
             get {
                 return ResourceManager.GetString("InvalidBrokerExceptionMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to convert &apos;someInvalidProvider&apos; to type &apos;Softplan.Common.Messaging.Abstractions.Enuns.ApmProviders&apos;..
+        /// </summary>
+        public static string InvalidProviderExceptionMessage {
+            get {
+                return ResourceManager.GetString("InvalidProviderExceptionMessage", resourceCulture);
             }
         }
     }

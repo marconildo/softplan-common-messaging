@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Threading;
 using Pose;
 
-namespace Softplan.Common.Messaging.TestsHelper
+namespace Softplan.Common.Messaging.Tests.Helper
 {
-    public static class PoseSemaphore
+    public static class PoseSemaphoreHelper
     {
         private static readonly Semaphore Semaphore = new Semaphore(1, 1);
         
