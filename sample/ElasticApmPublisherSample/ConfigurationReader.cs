@@ -20,17 +20,29 @@ namespace ElasticApmPublisherSample
 
         private const string Origin = "appsettings.json";
         private readonly IConfiguration _configuration;
+        public TimeSpan FlushInterval { get; }
         public LogLevel LogLevel { get; set; }
+        public int MaxBatchEventCount { get; }
+        public int MaxQueueEventCount { get; }
+        public double MetricsIntervalInMilliseconds { get; }
         public IReadOnlyList<Uri> ServerUrls { get; set; }
         public string ServiceName { get; set; }
+        public string ServiceVersion { get; }
+        public double SpanFramesMinDurationInMilliseconds { get; }
+        public int StackTraceLimit { get; }
         public string SecretToken { get; set; }
+        public string CaptureBody { get; }
+        public List<string> CaptureBodyContentTypes { get; }
         public bool CaptureHeaders { get; set; }
+        public bool CentralConfig { get; }
+        public string Environment { get; }
         public double TransactionSampleRate { get; set; }
+        public int TransactionMaxSpans { get; }
         public double MetricsIntervalInMillisecond { get; }
 
         private ConfigurationKeyValue Read(string key) => Kv(key, _configuration[key], Origin);
         
-        public ConfigurationReader(IConfiguration configuration) : base(null)
+        public ConfigurationReader(IConfiguration configuration) : base(default, default)
         {
             _configuration = configuration;
             SetLogLevel();

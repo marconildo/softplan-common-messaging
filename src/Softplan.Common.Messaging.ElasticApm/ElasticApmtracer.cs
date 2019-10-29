@@ -9,6 +9,8 @@ namespace Softplan.Common.Messaging.ElasticApm
     {        
         public ITransaction CurrentTransaction => Agent.Tracer.CurrentTransaction;
 
+        public ISpan CurrentSpan => Agent.Tracer.CurrentSpan;
+
         public void CaptureTransaction(
             string name, 
             string type, 

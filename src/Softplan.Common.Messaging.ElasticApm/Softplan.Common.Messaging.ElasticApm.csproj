@@ -6,11 +6,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Elastic.Apm.All" Version="1.0.0-beta1" />
+      <ProjectReference Include="..\Softplan.Common.Messaging.Abstractions\Softplan.Common.Messaging.Abstractions.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Softplan.Common.Messaging.Abstractions\Softplan.Common.Messaging.Abstractions.csproj" />
+      <PackageReference Include="Elastic.Apm.NetCoreAll" Version="1.1.2" />
     </ItemGroup>
 
 </Project>
