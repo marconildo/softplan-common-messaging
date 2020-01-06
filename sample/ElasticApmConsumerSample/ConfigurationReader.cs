@@ -22,8 +22,8 @@ namespace ElasticApmConsumerSample
         private readonly IConfiguration _configuration;
         public TimeSpan FlushInterval { get; }
         public LogLevel LogLevel { get; set; }
-        public int MaxBatchEventCount { get; }
-        public int MaxQueueEventCount { get; }
+        public int MaxBatchEventCount { get { return 1;} }
+        public int MaxQueueEventCount { get { return 1;} }
         public double MetricsIntervalInMilliseconds { get; }
         public IReadOnlyList<Uri> ServerUrls { get; set; }
         public string ServiceName { get; set; }
@@ -41,7 +41,7 @@ namespace ElasticApmConsumerSample
         public double MetricsIntervalInMillisecond { get; }
 
         private ConfigurationKeyValue Read(string key) => Kv(key, _configuration[key], Origin);
-        
+
         public ConfigurationReader(IConfiguration configuration) : base(default, default)
         {
             _configuration = configuration;

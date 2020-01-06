@@ -12,7 +12,7 @@ using Softplan.Common.Messaging.RabbitMq;
 namespace Softplan.Common.Messaging
 {
     public class MessagingBuilderFactory : IMessagingBuilderFactory
-    {                
+    {
         private MessageBrokers _messageBroker;
         private readonly IMessagingWorkersFactory _messagingWorkersFactory;
         private string _urlBroker;
@@ -28,7 +28,7 @@ namespace Softplan.Common.Messaging
             LoadConfigurations(config);
             return(Enum.IsDefined(typeof(MessageBrokers), _messageBroker) && !string.IsNullOrEmpty(_urlBroker) && !string.IsNullOrEmpty(_urlApiBroker));
         }
-        
+
         public IBuilder GetBuilder(IConfiguration config, ILoggerFactory loggerFactory)
         {
             if (!HasConfiguration(config))
@@ -41,8 +41,8 @@ namespace Softplan.Common.Messaging
                     throw new ArgumentOutOfRangeException(Resources.InvalidAmqpBroker);
             }
         }
-                
-        
+
+
         private void LoadConfigurations(IConfiguration config)
         {
             _messageBroker = config.GetMessageBroker();

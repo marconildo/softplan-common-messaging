@@ -13,8 +13,8 @@ namespace rpcExample
         {
             publisher.Publish(new FibMessage(message) { ErrorMessage = error.Message });
             return true;
-        }        
-        
+        }
+
         public void ProcessMessage(IMessage message, IPublisher publisher)
         {
             var number = ((FibMessage)message).Number;
@@ -33,11 +33,23 @@ namespace rpcExample
         {
             return typeof(FibMessage);
         }
-        
-        private static int CalculateFib(int number)
+        public static int CalculateFib(int number)
         {
-            if (number == 0 || number == 1) return number;
-            return CalculateFib(number - 1) + CalculateFib(number - 2);
+            int a = 0;
+            int b = 1;
+            // In number steps compute Fibonacci sequence iteratively.
+            for (int i = 0; i < number; i++)
+            {
+                int temp = a;
+                a = b;
+                b = temp + b;
+            }
+            return a;
         }
+
     }
 }
+
+
+
+

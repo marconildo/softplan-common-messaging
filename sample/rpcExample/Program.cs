@@ -13,9 +13,9 @@ namespace rpcExample
         private const string AppSettingsJson = "appsettings.json";
         private const string TestFibonacci = "test.fibonacci";
         private const string Quit = "quit";
-        
+
         private static IConfiguration GetConfiguration()
-        {            
+        {
             var builder = new ConfigurationBuilder()
                            .SetBasePath(Directory.GetCurrentDirectory())
                            .AddJsonFile(AppSettingsJson, true, true)
@@ -23,21 +23,23 @@ namespace rpcExample
 
             return builder.Build();
         }
-        
+
         static void Main(string[] args)
         {
             Console.WriteLine(Resources.IniciandoAplicacao);
             try
             {
-                var factory = new LoggerFactory();
+                var loggerFactory = new LoggerFactory();
                 var messagingBuilderFactory = new MessagingBuilderFactory();
-                var builder = messagingBuilderFactory.GetBuilder(GetConfiguration(), factory);
-                var publisher = builder.BuildPublisher();                
-                var manager = new MessagingManager(builder, factory);               
-                manager.LoadProcessors(null);
-                manager.Start();               
-                PubliqueMensagem(publisher);
-                manager.Stop();
+                using(var builder = messagingBuilderFactory.GetBuilder(GetConfiguration(), loggerFactory))
+                using(var manager = new MessagingManager(builder, loggerFactory))
+                {
+                    var publisher = builder.BuildPublisher();
+                    manager.LoadProcessors(null);
+                    manager.Start();
+                    PubliqueMensagem(publisher);
+                    manager.Stop();
+                }
                 Console.WriteLine(Resources.AplicacaoEncerrada);
             }
             catch (Exception err)

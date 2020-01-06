@@ -15,7 +15,7 @@ namespace Softplan.Common.Messaging.RabbitMq
         private readonly IQueueApiManager _manager;
         private readonly IMessageProcessor _messageProcessor;
         public string ConsumerTag { get; private set; }
-        
+
         private const string ParamName = "queue";
 
         public RabbitMqConsumer(IModel channel, IPublisher publisher, IBuilder builder, IQueueApiManager manager, IMessageProcessor messageProcessor)
@@ -38,7 +38,7 @@ namespace Softplan.Common.Messaging.RabbitMq
             consumer.Received += (channel, args) => OnMessageReceived(processor, queue, args);
             ConsumerTag = _channel.BasicConsume(queue, false, consumer);
         }
-        
+
         public void Stop()
         {
             if (!string.IsNullOrEmpty(ConsumerTag))
@@ -59,26 +59,26 @@ namespace Softplan.Common.Messaging.RabbitMq
             {
                 ProccessException(processor, args, message, ex);
             }
-        }        
+        }
 
         private void ValidateConsumerStarted()
         {
             if (!string.IsNullOrEmpty(ConsumerTag))
                 throw new InvalidOperationException(Resources.ConsumerAlreadyStarted);
         }
-        
+
         private static void ValidateQueueName(string queue)
         {
             if (string.IsNullOrEmpty(queue))
                 throw new ArgumentNullException(ParamName, Resources.QueueNameNotFound);
-        }        
-        
+        }
+
         private static void SetReplyQueue(BasicDeliverEventArgs args, IMessage message)
         {
             if (!string.IsNullOrEmpty(args.BasicProperties.ReplyTo))
                 message.ReplyQueue = args.BasicProperties.ReplyTo;
         }
-        
+
         private void ProccessException(IProcessor processor, BasicDeliverEventArgs args, IMessage message, Exception ex)
         {
             try
