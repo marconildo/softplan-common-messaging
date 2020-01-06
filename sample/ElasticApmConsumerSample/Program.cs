@@ -5,7 +5,6 @@ using Elastic.Apm.Config;
 using ElasticApmConsumerSample.Properties;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Softplan.Common.Messaging;
 using Softplan.Common.Messaging.Abstractions.Enuns;
 using Softplan.Common.Messaging.Extensions;
