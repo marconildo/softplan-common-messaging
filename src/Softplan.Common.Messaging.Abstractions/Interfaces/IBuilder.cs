@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Softplan.Common.Messaging.Abstractions.Interfaces
 {
-    public interface IBuilder
+    public interface IBuilder: IDisposable
     {
         IDictionary<string, Type> MessageQueueMap { get; }
         IPublisher BuildPublisher();

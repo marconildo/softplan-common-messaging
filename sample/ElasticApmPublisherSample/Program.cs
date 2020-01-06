@@ -21,11 +21,11 @@ namespace ElasticApmPublisherSample
         private const string Text = "Message published with success.";
         private const string SimpleMessageDestination = "SimpleMessageDestination";
         private const string FibonacciDestination = "FibDestination";
-        
+
         static void Main(string[] args)
         {
             try
-            {                
+            {
                 Console.WriteLine(Resources.StartingApplication);
                 var config = GetConfiguration(AppSettingsPublisher);
                 SetApmAgentConfiguration(config);
@@ -34,30 +34,30 @@ namespace ElasticApmPublisherSample
                 {
                     action = GetAction();
                     ExecuteAction(action, config);
-                } while (!string.Equals(action, "c", StringComparison.OrdinalIgnoreCase));                
+                } while (!string.Equals(action, "c", StringComparison.OrdinalIgnoreCase));
                 Console.WriteLine(Resources.ApplicationClosed);
                 Environment.Exit(0);
             }
             catch (Exception ex)
             {
-                Console.WriteLine(Resources.ApplicationError, ex.Message);
+                Console.WriteLine(Resources.ApplicationError + " " + ex.Message);
             }
-        }   
-        
+        }
+
         private static IConfiguration GetConfiguration(string settings)
-        {            
+        {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile(settings, true, true)
                 .AddEnvironmentVariables();
             return builder.Build();
         }
-        
+
         /// <summary>
         /// Obs.:
         /// The configuration of the agent must be done in the application, according to the available documentation: https://www.elastic.co/guide/en/apm/agent/dotnet/current/index.html.
         /// The messaging component supports distributed transaction control, but is not responsible for doing the agent configuration.
-        /// </summary>        
+        /// </summary>
         private static void SetApmAgentConfiguration(IConfiguration config)
         {
             var apmProvider = config.GetApmProvider();
@@ -65,7 +65,7 @@ namespace ElasticApmPublisherSample
             Console.WriteLine(Resources.SettingApmAgentConfiguration);
             var configurationReader = new ConfigurationReader(config) as IConfigurationReader;
             Agent.Setup(new AgentComponents(configurationReader: configurationReader));
-        } 
+        }
 
         private static string GetAction()
         {
@@ -80,7 +80,7 @@ namespace ElasticApmPublisherSample
 
             return action;
         }
-        
+
         private static void ExecuteAction(string action, IConfiguration config)
         {
             if (action.Equals("1"))
@@ -88,7 +88,7 @@ namespace ElasticApmPublisherSample
             if (action.Equals("2"))
                 PublishMessageAndWaitResponse(config);
         }
-        
+
         private static IPublisher GetPublisher(IConfiguration config)
         {
             var loggerFactory = new LoggerFactory();
@@ -99,7 +99,7 @@ namespace ElasticApmPublisherSample
         }
 
         private static void PublishMessage(IConfiguration config)
-        {                                          
+        {
             var publisher = GetPublisher(config);
             string quit;
             do
@@ -114,7 +114,7 @@ namespace ElasticApmPublisherSample
         }
 
         private static SimpleMessage GetSimpleMessage(MemberInfo method)
-        {            
+        {
             var name = $"{method.DeclaringType}.{method.Name}";
             var message = new SimpleMessage
             {
@@ -125,7 +125,7 @@ namespace ElasticApmPublisherSample
         }
 
         private static void PublishMessageAndWaitResponse(IConfiguration config)
-        {                                         
+        {
             var publisher = GetPublisher(config);
             string quit;
             do
@@ -133,27 +133,27 @@ namespace ElasticApmPublisherSample
                 Console.WriteLine(Resources.WaitingFibonacciNumber);
                 var value = quit = Console.ReadLine();
                 if (string.Equals(value, "b", StringComparison.OrdinalIgnoreCase)) break;
-                if (!GetValue(value, out var fibNum)) continue;  
-                Console.WriteLine(Resources.PublishingMessage); 
+                if (!GetValue(value, out var fibNum)) continue;
+                Console.WriteLine(Resources.PublishingMessage);
                 var method = new StackFrame().GetMethod();
                 var message = GetFibMessage(method, fibNum);
                 var reply = publisher.PublishAndWait<FibMessage>(message, FibonacciDestination).Result;
-                Console.WriteLine(Resources.ResponseReceived); 
+                Console.WriteLine(Resources.ResponseReceived);
                 Console.WriteLine(string.IsNullOrEmpty(reply.ErrorMessage)
                     ? string.Format(Resources.FibonacciResult, fibNum, reply.Number)
                     : string.Format(Resources.FibonacciError, reply.ErrorMessage));
             } while (!string.Equals(quit, "b", StringComparison.OrdinalIgnoreCase));
-        }                
-        
+        }
+
         private static bool GetValue(string value, out int fibNum)
-        {            
+        {
             if (int.TryParse(value, out fibNum)) return true;
             Console.WriteLine(Resources.InvalidIntValue, value);
             return false;
         }
-        
+
         private static FibMessage GetFibMessage(MemberInfo method, int fibNum)
-        {            
+        {
             var name = $"{method.DeclaringType}.{method.Name}";
             var message = new FibMessage
             {

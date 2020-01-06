@@ -18,8 +18,8 @@ namespace ElasticApmConsumerSample
         static void Main(string[] args)
         {
             try
-            {                
-                Console.WriteLine(Resources.StartingApplication);  
+            {
+                Console.WriteLine(Resources.StartingApplication);
                 var config = GetConfiguration(AppSettingsConsumer);
                 SetApmAgentConfiguration(config);
                 ProccessQueueMessage(config);
@@ -28,12 +28,12 @@ namespace ElasticApmConsumerSample
             }
             catch (Exception ex)
             {
-                Console.WriteLine(Resources.ApplicationError, ex.Message);
-            }            
+                Console.WriteLine(Resources.ApplicationError + " " + ex.Message);
+            }
         }
-        
+
         private static void ProccessQueueMessage(IConfiguration config)
-        {                  
+        {
             var loggerFactory = new LoggerFactory();
             var messagingBuilderFactory = new MessagingBuilderFactory();
             var builder = messagingBuilderFactory.GetBuilder(config, loggerFactory);
@@ -43,24 +43,24 @@ namespace ElasticApmConsumerSample
                 manager.Start();
                 Console.WriteLine(Resources.ClosingApplication);
                 Console.ReadLine();
-                manager.Stop();                
+                manager.Stop();
             }
         }
-        
+
         private static IConfiguration GetConfiguration(string settings)
-        {            
+        {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile(settings, true, true)
                 .AddEnvironmentVariables();
             return builder.Build();
         }
-        
+
         /// <summary>
         /// Obs.:
         /// The configuration of the agent must be done in the application, according to the available documentation: https://www.elastic.co/guide/en/apm/agent/dotnet/current/index.html.
         /// The messaging component supports distributed transaction control, but is not responsible for doing the agent configuration.
-        /// </summary>       
+        /// </summary>
         private static void SetApmAgentConfiguration(IConfiguration config)
         {
             var apmProvider = config.GetApmProvider();
@@ -68,6 +68,6 @@ namespace ElasticApmConsumerSample
             Console.WriteLine(Resources.SettingApmAgentConfiguration);
             var configurationReader = new ConfigurationReader(config) as IConfigurationReader;
             Agent.Setup(new AgentComponents(configurationReader: configurationReader));
-        } 
+        }
     }
 }

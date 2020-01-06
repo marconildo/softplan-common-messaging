@@ -18,7 +18,7 @@ namespace Softplan.Common.Messaging.RabbitMq
         private IConnection _connection;
         private IQueueApiManager _apiManager;
 
-        public IDictionary<string, Type> MessageQueueMap { get; }        
+        public IDictionary<string, Type> MessageQueueMap { get; }
         public IConnectionFactory ConnectionFactory { get; set; }
 
         private IConnection Connection
@@ -31,7 +31,7 @@ namespace Softplan.Common.Messaging.RabbitMq
                 _connection = ConnectionFactory.CreateConnection();
                 return _connection;
             }
-        }        
+        }
 
         private const string Guest = "guest";
 
@@ -49,13 +49,13 @@ namespace Softplan.Common.Messaging.RabbitMq
                 return _apiManager;
 
             _logger.LogTrace(Resources.APIManagerCreating);
-            var url = _config.GetValue<string>(EnvironmentConstants.MessageBrokerApiUrl);            
+            var url = _config.GetValue<string>(EnvironmentConstants.MessageBrokerApiUrl);
             var (user, password) = GetUserData(url);
             var channel = Connection.CreateModel();
             _apiManager = new RabbitMqApiManager(url, user, password, channel);
 
             return _apiManager;
-        }        
+        }
 
         public IConsumer BuildConsumer()
         {
@@ -86,7 +86,7 @@ namespace Softplan.Common.Messaging.RabbitMq
         {
             return new RabbitMqPublisher(channel, BuildSerializer(), BuildApiManager(), _messagingWorkersFactory.GetMessagePublisher(_config));
         }
-        
+
         private static (string, string) GetUserData(string url)
         {
             var parser = new Uri(url);
@@ -95,7 +95,7 @@ namespace Softplan.Common.Messaging.RabbitMq
             var password = userInfo.Length >= 2 ? userInfo[1] : Guest;
             return (user, password);
         }
-        
+
         private ConnectionFactory GetConnectionFactory1()
         {
             return new ConnectionFactory { Uri = new Uri(_config.GetValue<string>(EnvironmentConstants.MessageBrokerUrl)) };
