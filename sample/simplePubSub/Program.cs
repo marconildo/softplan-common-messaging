@@ -12,9 +12,9 @@ namespace simplePubSub
         private const string AppSettingsJson = "appsettings.json";
         private const string ItsWorking = "It's working";
         private const string Queue = "testQueue123";
-        
+
         private static IConfiguration GetConfiguration()
-        {            
+        {
             var builder = new ConfigurationBuilder()
                            .SetBasePath(Directory.GetCurrentDirectory())
                            .AddJsonFile(AppSettingsJson, true, true)
@@ -27,16 +27,16 @@ namespace simplePubSub
             Console.WriteLine(Resources.IniciandoAplicacao);
             try
             {
-                var factory = new LoggerFactory();
+                var loggerFactory = new LoggerFactory();
                 var settings = GetConfiguration();
                 var messagingBuilderFactory = new MessagingBuilderFactory();
-                var builder = messagingBuilderFactory.GetBuilder(settings, factory);
-                using (var manager = new MessagingManager(builder, factory))
+                using (var builder = messagingBuilderFactory.GetBuilder(settings, loggerFactory))
+                using (var manager = new MessagingManager(builder, loggerFactory))
                 {
                     var publisher = builder.BuildPublisher();
                     manager.LoadProcessors(null);
                     manager.Start();
-                    Console.WriteLine(Resources.PublicandoMensagem);                    
+                    Console.WriteLine(Resources.PublicandoMensagem);
                     publisher.Publish(new ExampleMessage() { Text = ItsWorking }, Queue);
                     Console.WriteLine(Resources.RodandoAplicacao);
                     Console.ReadLine();
